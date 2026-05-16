@@ -223,6 +223,10 @@ QWidget (顶层窗口)
 ```
 SnakeArena/
 ├── CMakeLists.txt
+├── assets/                           # 素材资源（字体/音频/图片）
+│   ├── fonts/
+│   ├── audio/
+│   └── images/
 ├── src/
 │   ├── main.cpp                     # 客户端入口
 │   ├── main_server.cpp              # 服务端入口
@@ -274,8 +278,6 @@ SnakeArena/
 │   └── resources/
 │       ├── resources.qrc
 │       ├── style/main.qss
-│       ├── fonts/
-│       ├── audio/
 │       └── i18n/
 │           ├── snake_zh.ts
 │           └── snake_en.ts

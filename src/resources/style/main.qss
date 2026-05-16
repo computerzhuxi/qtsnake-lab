@@ -1,0 +1,6 @@
+/* 全局暗色电竞风格 - 待 Task 10 完善 */
+QWidget {
+    background-color: #06060f;
+    color: #ccc;
+    font-family: "Consolas", "Courier New", monospace;
+}

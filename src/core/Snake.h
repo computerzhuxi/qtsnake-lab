@@ -5,7 +5,7 @@
 #include "Point.h"
 #include "Direction.h"
 
-/// \brief 蛇模型：管理身体段、移动、增长和方向控制
+/// \brief 蛇模型：管理身体段、移动、增长、方向控制和自撞检测
 class Snake {
 public:
     explicit Snake(Point start = Point{3, 3}, Direction initialDir = Direction::Right);
@@ -15,6 +15,7 @@ public:
     void grow();
     const std::vector<Point>& body() const;
     Point head() const;
+    bool checkSelfCollision() const;
 
 private:
     std::vector<Point> m_body;

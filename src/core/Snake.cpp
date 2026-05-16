@@ -57,3 +57,11 @@ const std::vector<Point>& Snake::body() const {
 Point Snake::head() const {
     return m_body.front();
 }
+
+bool Snake::checkSelfCollision() const {
+    Point h = head();
+    for (size_t i = 1; i < m_body.size(); ++i) {
+        if (m_body[i] == h) return true;
+    }
+    return false;
+}

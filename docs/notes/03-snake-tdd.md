@@ -6,18 +6,19 @@
 
 ## 怎么做
 
-先写 12 个测试，再实现 Snake.cpp：
+先写 16 个测试，再实现 Snake.cpp：
 
 1. `initialLengthIsThree` — 新蛇有 3 节身体
 2. `initialDirectionIsRight` — 默认方向向右
 3. `customInitialDirection` — 支持自定义初始方向
-4. `bodyOppositeToDirection` — 身体段往方向的反方向生成（如方向 Right，身体在左边）
-5. `initialHeadPosition` — 头部在指定起始位置
-6. `moveUpdatesPositions` — 移动后头部位置更新
-7. `moveUp` / `moveLeft` / `moveDown` — 四个方向移动
-8. `bodyFollowsHeadAfterMoves` — 身体跟随头部
-9. `cannotReverseToOppositeDirection` — 禁止 180 度反转
-10. `growIncreasesLength` — grow() 后长度 +1
+4. `bodyOppositeToDirection` — 身体段往方向的反方向生成（4 方向各一个测试）
+5. `moveUpdatesPositions` — 移动后头部位置更新
+6. `moveUp` / `moveLeft` / `moveDown` — 四个方向移动
+7. `bodyFollowsHeadAfterMoves` — 身体跟随头部
+8. `cannotReverseToOppositeDirection` — 禁止 180 度反转
+9. `growIncreasesLength` — grow() 后长度 +1
+10. `noSelfCollisionInitially` — 新蛇不自撞
+11. `selfCollisionWhenHeadHitsBody` — 蛇头绕圈撞到自己身体
 
 Snake 实现：
 - 构造函数 `Snake(Point start, Direction dir)`，头在 start，身体往 dir 的反方向延伸

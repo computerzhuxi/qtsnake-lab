@@ -8,7 +8,7 @@
 /// \brief 蛇模型：管理身体段、移动、增长和方向控制
 class Snake {
 public:
-    explicit Snake(Point start = Point{3, 3});
+    explicit Snake(Point start = Point{3, 3}, Direction initialDir = Direction::Right);
     void setDirection(Direction dir);
     Direction direction() const;
     void move();

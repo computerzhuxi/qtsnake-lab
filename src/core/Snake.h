@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_CORE_SNAKE_H
+#define SNAKE_CORE_SNAKE_H
+
 #include <vector>
 #include "Point.h"
 #include "Direction.h"
@@ -19,3 +21,5 @@ private:
     Direction m_direction = Direction::Right;
     bool m_growNext = false;
 };
+
+#endif // SNAKE_CORE_SNAKE_H

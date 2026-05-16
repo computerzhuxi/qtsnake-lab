@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SNAKE_AUDIO_AUDIOMANAGER_H
+#define SNAKE_AUDIO_AUDIOMANAGER_H
 
 enum class SoundEffect { Eat, Die, MenuClick, Countdown, Go };
 
@@ -14,3 +15,5 @@ private:
     AudioManager() = default;
     int m_volume = 50;
 };
+
+#endif // SNAKE_AUDIO_AUDIOMANAGER_H

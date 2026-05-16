@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_CORE_BOARD_H
+#define SNAKE_CORE_BOARD_H
+
 #include <random>
 #include "Point.h"
 #include "Snake.h"
@@ -26,3 +28,5 @@ private:
     std::uniform_int_distribution<int> m_distY;
     Point randomPoint();
 };
+
+#endif // SNAKE_CORE_BOARD_H

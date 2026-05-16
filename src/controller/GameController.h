@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_CONTROLLER_GAMECONTROLLER_H
+#define SNAKE_CONTROLLER_GAMECONTROLLER_H
+
 #include <QObject>
 #include <QTimer>
 #include "Board.h"
@@ -41,3 +43,5 @@ private:
     int m_score = 0;
     int m_countdownValue = 3;
 };
+
+#endif // SNAKE_CONTROLLER_GAMECONTROLLER_H

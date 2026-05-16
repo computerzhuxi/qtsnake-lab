@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_APP_MAINMENUWIDGET_H
+#define SNAKE_APP_MAINMENUWIDGET_H
+
 #include <QWidget>
 #include <QPushButton>
 #include <QLabel>
@@ -17,3 +19,5 @@ signals:
     void settingsClicked();
     void exitClicked();
 };
+
+#endif // SNAKE_APP_MAINMENUWIDGET_H

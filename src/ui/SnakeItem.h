@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_UI_SNAKEITEM_H
+#define SNAKE_UI_SNAKEITEM_H
+
 #include <QGraphicsItem>
 #include <QColor>
 
@@ -14,3 +16,5 @@ public:
 private:
     bool m_isHead;
 };
+
+#endif // SNAKE_UI_SNAKEITEM_H

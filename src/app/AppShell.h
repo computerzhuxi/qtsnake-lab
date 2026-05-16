@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_APP_APPSHELL_H
+#define SNAKE_APP_APPSHELL_H
+
 #include <QWidget>
 #include "GameController.h"
 #include "GameView.h"
@@ -38,3 +40,5 @@ private:
     GameOverWidget* m_gameOver;
     SettingsWidget* m_settingsWidget;
 };
+
+#endif // SNAKE_APP_APPSHELL_H

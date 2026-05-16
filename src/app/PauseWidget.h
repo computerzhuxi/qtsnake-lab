@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_APP_PAUSEWIDGET_H
+#define SNAKE_APP_PAUSEWIDGET_H
+
 #include <QWidget>
 
 /// \brief 暂停浮层：继续/重新开始/设置/返回主菜单
@@ -13,3 +15,5 @@ signals:
     void settingsClicked();
     void menuClicked();
 };
+
+#endif // SNAKE_APP_PAUSEWIDGET_H

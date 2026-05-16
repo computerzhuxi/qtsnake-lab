@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_LOGGING_LOGGER_H
+#define SNAKE_LOGGING_LOGGER_H
+
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -33,3 +35,5 @@ private:
 #define LOG_INFO(tag, msg)  Logger::instance().log(LogLevel::Info,  tag, msg)
 #define LOG_WARN(tag, msg)  Logger::instance().log(LogLevel::Warning, tag, msg)
 #define LOG_ERROR(tag, msg) Logger::instance().log(LogLevel::Error, tag, msg)
+
+#endif // SNAKE_LOGGING_LOGGER_H

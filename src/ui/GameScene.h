@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_UI_GAMESCENE_H
+#define SNAKE_UI_GAMESCENE_H
+
 #include <QGraphicsScene>
 #include <QMap>
 #include "SnakeItem.h"
@@ -19,3 +21,5 @@ private:
     FoodItem* m_foodItem = nullptr;
     int cellToPixel(int cell) const;
 };
+
+#endif // SNAKE_UI_GAMESCENE_H

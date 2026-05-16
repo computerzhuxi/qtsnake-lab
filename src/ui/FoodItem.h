@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_UI_FOODITEM_H
+#define SNAKE_UI_FOODITEM_H
+
 #include <QGraphicsItem>
 #include <QColor>
 
@@ -11,3 +13,5 @@ public:
     static constexpr int cellSize = 24;
     static constexpr int radius = 6;
 };
+
+#endif // SNAKE_UI_FOODITEM_H

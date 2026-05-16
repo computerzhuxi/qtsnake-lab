@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SNAKE_CORE_POINT_H
+#define SNAKE_CORE_POINT_H
 
 /// \brief 二维坐标点，表示棋盘上的一个格子位置
 struct Point {
@@ -12,3 +13,5 @@ struct Point {
         return x == other.x && y == other.y;
     }
 };
+
+#endif // SNAKE_CORE_POINT_H

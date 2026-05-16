@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SNAKE_APP_GAMEOVERWIDGET_H
+#define SNAKE_APP_GAMEOVERWIDGET_H
+
 #include <QWidget>
 
 /// \brief 结算浮层：显示分数/统计，再来一局/保存回放/返回主菜单
@@ -13,3 +15,5 @@ signals:
     void saveReplayClicked();
     void menuClicked();
 };
+
+#endif // SNAKE_APP_GAMEOVERWIDGET_H

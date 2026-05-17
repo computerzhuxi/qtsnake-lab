@@ -1,6 +1,80 @@
-/* 全局暗色电竞风格 - 待 Task 10 完善 */
+/* 全局 */
 QWidget {
     background-color: #06060f;
     color: #ccc;
     font-family: "Consolas", "Courier New", monospace;
+}
+
+/* 按钮 */
+QPushButton {
+    background-color: #0d0d28;
+    border: 1px solid #222255;
+    border-radius: 5px;
+    color: #ccc;
+    padding: 9px 0;
+    font-size: 14px;
+    min-width: 200px;
+}
+QPushButton:hover {
+    border-color: #00ff88;
+    color: #00ff88;
+}
+QPushButton:pressed {
+    background-color: #0a0a1e;
+}
+QPushButton#btnDanger {
+    border-color: #332233;
+    color: #ff6688;
+}
+QPushButton#btnDanger:hover {
+    border-color: #ff6688;
+}
+QPushButton#btnPrimary {
+    color: #00ff88;
+    border-color: #225544;
+}
+QPushButton#btnPrimary:hover {
+    border-color: #00ff88;
+}
+
+/* 标签 */
+QLabel {
+    color: #ccc;
+    background: transparent;
+}
+QLabel#titleLabel {
+    color: #e0e0ff;
+    font-size: 28px;
+}
+QLabel#subtitleLabel {
+    color: #556;
+    font-size: 11px;
+}
+QLabel#scoreLabel {
+    color: #00ff88;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+/* 输入框 */
+QLineEdit {
+    background-color: #08081a;
+    border: 1px solid #1a1a4e;
+    border-radius: 4px;
+    color: #0ff;
+    padding: 7px 12px;
+    font-size: 14px;
+}
+QLineEdit:focus {
+    border-color: #00ff88;
+}
+
+/* 浮层面板 */
+QWidget#overlay {
+    background-color: rgba(6, 6, 15, 240);
+}
+QWidget#panel {
+    background-color: #0a0a1a;
+    border: 1px solid #1a1a4e;
+    border-radius: 10px;
 }

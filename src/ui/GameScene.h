@@ -19,6 +19,9 @@ public:
 private:
     QMap<int, QVector<SnakeItem*>> m_snakeItems;
     FoodItem* m_foodItem = nullptr;
+    QGraphicsRectItem* m_borderItem = nullptr;
+    int m_boardW = 20;
+    int m_boardH = 20;
     int cellToPixel(int cell) const;
 };
 

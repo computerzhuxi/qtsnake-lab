@@ -2,43 +2,43 @@
 #define SNAKE_APP_APPSHELL_H
 
 #include <QWidget>
+#include <QStackedWidget>
 #include "GameController.h"
 #include "GameView.h"
 #include "GameScene.h"
 
 class MainMenuWidget;
-class PauseWidget;
-class GameOverWidget;
+class GamePage;
 class SettingsWidget;
 
-/// \brief 应用外壳：管理游戏底层与浮层叠加，分发键盘事件，协调各浮层切换
+/// \brief 应用外壳：QStackedWidget 管理菜单页/游戏页，Settings 全局浮层
 class AppShell : public QWidget {
     Q_OBJECT
 public:
     explicit AppShell(QWidget* parent = nullptr);
     ~AppShell();
-    void showMainMenu();
-    void showPause();
-    void showGameOver();
-    void showSettings();
-    void hideAllOverlays();
-    void startSinglePlayer();
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private slots:
     void onControllerStateChanged(GameController::State state);
+    void onCountdownTick(int number);
 
 private:
     void setupUI();
-    GameScene* m_scene;
-    GameView* m_view;
-    GameController* m_controller;
+    void showMenu();
+    void showGame();
+    void showSettings();
+    void startSinglePlayer();
+
+    QStackedWidget* m_stack;
     MainMenuWidget* m_mainMenu;
-    PauseWidget* m_pauseWidget;
-    GameOverWidget* m_gameOver;
+    GamePage* m_gamePage;
     SettingsWidget* m_settingsWidget;
+    GameController* m_controller;
+    int m_currentScore = 0;
 };
 
 #endif // SNAKE_APP_APPSHELL_H

@@ -1,37 +1,53 @@
 #include "GameScene.h"
+#include <QPen>
+#include <QBrush>
 
 GameScene::GameScene(QObject* parent) : QGraphicsScene(parent) {
     setBackgroundBrush(QColor("#06060f"));
 }
 
 void GameScene::syncFromBoard(const Board& board, const std::vector<Snake*>& snakes) {
+    m_boardW = board.width();
+    m_boardH = board.height();
+    int pixelW = m_boardW * SnakeItem::cellSize;
+    int pixelH = m_boardH * SnakeItem::cellSize;
+    setSceneRect(0, 0, pixelW, pixelH);
+
+    if (m_borderItem) {
+        removeItem(m_borderItem);
+        delete m_borderItem;
+        m_borderItem = nullptr;
+    }
+
+    m_borderItem = new QGraphicsRectItem(0, 0, pixelW, pixelH);
+    m_borderItem->setPen(QPen(QColor("#00ff88"), 3));
+    m_borderItem->setBrush(QColor("#0a0a14"));
+    m_borderItem->setZValue(-1);
+    addItem(m_borderItem);
+
     for (size_t i = 0; i < snakes.size(); ++i) {
         int key = static_cast<int>(i);
         const auto& body = snakes[i]->body();
         auto& items = m_snakeItems[key];
 
-        // 增长：body 比 item 多
         while (items.size() < body.size()) {
             auto* item = new SnakeItem(false);
             addItem(item);
             items.append(item);
         }
 
-        // 缩减（其他蛇死亡）：body 比 item 少
         while (items.size() > body.size()) {
             auto* item = items.takeLast();
             removeItem(item);
             delete item;
         }
 
-        // 更新位置和头/身状态
         for (size_t j = 0; j < body.size(); ++j) {
             items[j]->setPos(cellToPixel(body[j].x), cellToPixel(body[j].y));
             items[j]->setIsHead(j == 0);
         }
     }
 
-    // 清理已消失的蛇
     for (auto it = m_snakeItems.begin(); it != m_snakeItems.end(); ) {
         int key = it.key();
         if (key >= static_cast<int>(snakes.size())) {
@@ -45,7 +61,6 @@ void GameScene::syncFromBoard(const Board& board, const std::vector<Snake*>& sna
         }
     }
 
-    // 食物：首次创建，后续只移动
     Food food = board.food();
     if (!m_foodItem) {
         m_foodItem = new FoodItem();

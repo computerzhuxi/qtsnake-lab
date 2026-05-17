@@ -1,5 +1,6 @@
 add_library(snake_app STATIC
   AppShell.cpp
+  GamePage.cpp
   MainMenuWidget.cpp
   PauseWidget.cpp
   GameOverWidget.cpp

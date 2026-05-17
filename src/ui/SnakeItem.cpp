@@ -6,6 +6,13 @@ SnakeItem::SnakeItem(bool isHead, QGraphicsItem* parent)
 {
 }
 
+void SnakeItem::setIsHead(bool isHead) {
+    if (m_isHead != isHead) {
+        m_isHead = isHead;
+        update();
+    }
+}
+
 QRectF SnakeItem::boundingRect() const {
     int s = cellSize;
     return QRectF(-s / 2, -s / 2, s, s);

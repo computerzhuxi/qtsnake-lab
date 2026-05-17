@@ -8,6 +8,7 @@
 class SnakeItem : public QGraphicsItem {
 public:
     SnakeItem(bool isHead, QGraphicsItem* parent = nullptr);
+    void setIsHead(bool isHead);
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
     static constexpr int cellSize = 24;

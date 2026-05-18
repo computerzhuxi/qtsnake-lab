@@ -2,6 +2,17 @@
 
 > Phase-2 · 改动幅度：中 · 串行序号：9 · 前置：T-01、T-02、T-03
 
+## 来自 T-02 审查的强化项（主程备忘）
+
+T-02 已经新建了 `tests/test_game_controller.cpp` 的骨架，包含 2 个用例。T-09 在此基础上**必须**追加以下强化：
+
+- **TEST-1（QApplication 生命周期）**：当前 `tests/test_game_controller.cpp:8-11` 使用全局静态 `QApplication g_app(...)`，依赖链接器把它在 `gtest_main::main()` 之前调起，在 MSVC + GTest 配置下能跑但工具链脆弱。T-09 必须把 QApplication 迁移到下列之一：
+  - `::testing::Environment` 子类，在 `SetUp()` 中构造、`TearDown()` 中析构；或
+  - 自定义 `main()` 替换 `gtest_main`，在其中构造 QApplication。
+- **TEST-2（防叠加测试不够强）**：当前 `repeatedHandleReadyKeyDoesNotStack` 实际依赖 `handleReadyKey()` 的 Ready-state 早退路径，未真正验证 `disconnect()` 起效。T-09 必须新增：
+  - 一个"强制重连"测试：例如通过 `controller.reset()` 把状态回 Idle 后再 `startGame()` + `handleReadyKey()` 多次，验证 `m_countdownTimer` 的 timeout 连接数最终仍为 1（可用 `QSignalSpy` 或对 `countdownTick` 信号在固定时间窗内的总发射次数做更紧的上界断言）。
+
+
 ## 任务描述
 
 补齐 `GameController` 状态机的回归测试，并为后续 Phase（AI / network / replay）建立 "Controller 行为契约" 的测试基线。

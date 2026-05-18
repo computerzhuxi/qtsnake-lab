@@ -3,7 +3,11 @@
 
 #include <QWidget>
 
-/// \brief 设置浮层：操作标签（键位/语言）+ 游戏标签（速度/大小/音量）
+/// \brief 设置全局浮层
+/// \details 半透明遮罩 + 居中面板。两个标签页：
+///          - 操作：键位选择（方向键/WASD）、语言切换（中文/English）
+///          - 游戏：速度（慢/中/快）、大小（小/中/大）、音量滑块
+
 class SettingsWidget : public QWidget {
     Q_OBJECT
 public:

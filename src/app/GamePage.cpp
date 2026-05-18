@@ -31,8 +31,6 @@ GamePage::GamePage(QWidget* parent) : QWidget(parent) {
 GameScene* GamePage::scene() const { return m_scene; }
 GameView* GamePage::view() const { return m_view; }
 
-void GamePage::setController(GameController*) {}
-
 void GamePage::enter() {
     m_scene->clearAll();
 }
@@ -41,9 +39,6 @@ void GamePage::exit() {
     m_scene->clearAll();
     hideAllOverlays();
 }
-
-PauseWidget* GamePage::pauseWidget() const { return m_pauseWidget; }
-GameOverWidget* GamePage::gameOverWidget() const { return m_gameOver; }
 
 void GamePage::showPause() {
     hideAllOverlays();

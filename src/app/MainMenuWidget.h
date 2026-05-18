@@ -5,7 +5,10 @@
 #include <QPushButton>
 #include <QLabel>
 
-/// \brief 主菜单页面：标题、四模式按钮、设置/退出入口
+/// \brief 主菜单页面
+/// \details 标题 + 蛇形装饰 + 四模式按钮（单机可用，其余占位）+ 设置/退出链接。
+///          使用 enter/exit 生命周期（当前无需额外操作）。
+
 class MainMenuWidget : public QWidget {
     Q_OBJECT
 public:

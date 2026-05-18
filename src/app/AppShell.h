@@ -10,8 +10,14 @@
 class MainMenuWidget;
 class GamePage;
 class SettingsWidget;
+class InputComponent;
 
-/// \brief 应用外壳：QStackedWidget 管理菜单页/游戏页，Settings 全局浮层
+/// \brief 应用外壳（顶层窗口）
+/// \details 使用 QStackedWidget 管理两个页面：
+///          - Page 0: 主菜单
+///          - Page 1: 游戏画面 + 浮层
+///          SettingsWidget 为全局浮层，覆盖在 QStackedWidget 上方。
+
 class AppShell : public QWidget {
     Q_OBJECT
 public:
@@ -33,12 +39,13 @@ private:
     void showSettings();
     void startSinglePlayer();
 
-    QStackedWidget* m_stack;
-    MainMenuWidget* m_mainMenu;
-    GamePage* m_gamePage;
-    SettingsWidget* m_settingsWidget;
-    GameController* m_controller;
-    int m_currentScore = 0;
+    QStackedWidget* m_stack;                ///< 页面容器（菜单 / 游戏）
+    MainMenuWidget* m_mainMenu;             ///< 主菜单页面
+    GamePage* m_gamePage;                   ///< 游戏页面
+    SettingsWidget* m_settingsWidget;       ///< 全局设置浮层
+    GameController* m_controller = nullptr; ///< 当前游戏控制器（无游戏时为 nullptr）
+    InputComponent* m_inputComponent = nullptr; ///< 输入组件
+    int m_currentScore = 0;                 ///< 当前分数
 };
 
 #endif // SNAKE_APP_APPSHELL_H

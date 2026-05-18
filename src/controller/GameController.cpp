@@ -1,154 +1,135 @@
 #include "GameController.h"
+#include "components/InputComponent.h"
+#include "components/MoveComponent.h"
+#include "components/CollisionComponent.h"
+#include "components/FoodComponent.h"
+#include "components/RenderComponent.h"
 #include "GameScene.h"
 #include "Logger.h"
-#include <random>
 
 GameController::GameController(GameScene* scene, QObject* parent)
     : QObject(parent)
-    , m_scene(scene)
     , m_timer(new QTimer(this))
+    , m_input(std::make_unique<InputComponent>())
+    , m_move(std::make_unique<MoveComponent>())
+    , m_collision(std::make_unique<CollisionComponent>())
+    , m_food(std::make_unique<FoodComponent>())
+    , m_render(std::make_unique<RenderComponent>(scene))
 {
-    connect(m_timer, &QTimer::timeout, this, &GameController::tick);
+    connect(m_timer, &QTimer::timeout, this, &GameController::update);
 }
 
 void GameController::startGame(int boardW, int boardH, int speedMs) {
-    delete m_board;
-    delete m_playerSnake;
-
-    m_board = new Board(boardW, boardH);
-    m_score = 0;
+    m_boardW = boardW;
+    m_boardH = boardH;
+    m_speedMs = speedMs;
     m_timer->setInterval(speedMs);
 
-    // 随机出生位置
+    m_state = GameState{};
+    m_state.board.width = boardW;
+    m_state.board.height = boardH;
+
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> distX(0, boardW - 1);
-    std::uniform_int_distribution<int> distY(0, boardH - 1);
+    std::uniform_int_distribution<int> dx(0, boardW - 1);
+    std::uniform_int_distribution<int> dy(0, boardH - 1);
+    Point spawn(dx(gen), dy(gen));
 
-    Point spawn(distX(gen), distY(gen));
-
-    // 智能选方向：排除会让身体越界的方向
-    Direction possible[4] = { Direction::Right, Direction::Left, Direction::Down, Direction::Up };
-    Direction safeDirs[4];
-    int safeCount = 0;
-
-    for (auto dir : possible) {
-        int seg2x = spawn.x, seg2y = spawn.y;
-        int seg3x = spawn.x, seg3y = spawn.y;
-        switch (dir) {
-            case Direction::Right: seg2x--; seg3x -= 2; break;
-            case Direction::Left:  seg2x++; seg3x += 2; break;
-            case Direction::Down:  seg2y--; seg3y -= 2; break;
-            case Direction::Up:    seg2y++; seg3y += 2; break;
-        }
-        if (seg3x >= 0 && seg3x < boardW && seg3y >= 0 && seg3y < boardH) {
-            safeDirs[safeCount++] = dir;
-        }
+    struct { Direction d; int ox; int oy; } checks[] = {
+        {Direction::Right, -1, 0}, {Direction::Left, 1, 0},
+        {Direction::Down, 0, -1}, {Direction::Up, 0, 1}
+    };
+    Direction safe[4]; int cnt = 0;
+    for (auto& c : checks) {
+        if (spawn.x + c.ox * 2 >= 0 && spawn.x + c.ox * 2 < boardW &&
+            spawn.y + c.oy * 2 >= 0 && spawn.y + c.oy * 2 < boardH)
+            safe[cnt++] = c.d;
     }
+    Direction dir = cnt > 0 ? safe[std::uniform_int_distribution<int>(0, cnt - 1)(gen)] : Direction::Right;
 
-    Direction initialDir = Direction::Right;
-    if (safeCount > 0) {
-        initialDir = safeDirs[gen() % safeCount];
-    }
+    m_state.snakes.emplace_back(spawn, dir);
 
-    m_playerSnake = new Snake(spawn, initialDir);
-    m_board->spawnFood(m_playerSnake);
-    m_state = State::Ready;
+    initComponents();
+    m_phase = State::Ready;
+    emit stateChanged(m_phase);
+    emit scoreChanged(m_state.score);
 
-    emit stateChanged(m_state);
-    emit scoreChanged(m_score);
+    m_render->update(m_state);
 
-    std::vector<Snake*> snakes = {m_playerSnake};
-    m_scene->syncFromBoard(*m_board, snakes);
+    LOG_INFO("GameController", "State: Idle -> Ready");
+}
 
-    LOG_INFO("GameController", "Game started at (" + std::to_string(spawn.x)
-             + "," + std::to_string(spawn.y) + ") dir=" + std::to_string(static_cast<int>(initialDir)));
+void GameController::initComponents() {
+    m_input->init(m_state);
+    m_move->init(m_state);
+    m_food->init(m_state);
 }
 
 void GameController::handleReadyKey() {
-    if (m_state != State::Ready) return;
+    if (m_phase != State::Ready) return;
 
-    m_state = State::Countdown;
+    LOG_INFO("GameController", "State: Ready -> Countdown");
+    m_phase = State::Countdown;
     m_countdownValue = 3;
-    emit stateChanged(m_state);
+    emit stateChanged(m_phase);
     emit countdownTick(m_countdownValue);
 
-    auto* countdownTimer = new QTimer(this);
-    countdownTimer->setInterval(700);
-    connect(countdownTimer, &QTimer::timeout, this, [this, countdownTimer]() {
+    auto* ct = new QTimer(this);
+    ct->setInterval(700);
+    connect(ct, &QTimer::timeout, this, [this, ct]() {
         m_countdownValue--;
         if (m_countdownValue > 0) {
             emit countdownTick(m_countdownValue);
         } else {
             emit countdownTick(0);
-            countdownTimer->stop();
-            countdownTimer->deleteLater();
-            m_state = State::Playing;
-            emit stateChanged(m_state);
+            ct->stop(); ct->deleteLater();
+            m_phase = State::Playing;
+            emit stateChanged(m_phase);
             m_timer->start();
-            LOG_INFO("GameController", "Game playing");
+            LOG_INFO("GameController", "State: Countdown -> Playing");
         }
     });
-    countdownTimer->start();
+    ct->start();
 }
 
 void GameController::pause() {
-    if (m_state != State::Playing) return;
+    if (m_phase != State::Playing) return;
+    LOG_INFO("GameController", "State: Playing -> Paused");
     m_timer->stop();
-    m_state = State::Paused;
-    emit stateChanged(m_state);
+    m_phase = State::Paused;
+    emit stateChanged(m_phase);
 }
 
 void GameController::resume() {
-    if (m_state != State::Paused) return;
-    m_state = State::Playing;
-    emit stateChanged(m_state);
+    if (m_phase != State::Paused) return;
+    LOG_INFO("GameController", "State: Paused -> Playing");
+    m_phase = State::Playing;
+    emit stateChanged(m_phase);
     m_timer->start();
 }
 
 void GameController::reset() {
+    LOG_INFO("GameController", "State: -> Idle (reset)");
     m_timer->stop();
-    delete m_board;
-    delete m_playerSnake;
-    m_board = nullptr;
-    m_playerSnake = nullptr;
-    m_state = State::Idle;
-    emit stateChanged(m_state);
+    m_state = GameState{};
+    m_phase = State::Idle;
+    emit stateChanged(m_phase);
 }
 
-void GameController::handleKeyPress(Direction dir) {
-    if (m_state == State::Playing && m_playerSnake) {
-        m_playerSnake->setDirection(dir);
-    }
-}
+void GameController::update() {
+    if (m_phase != State::Playing) return;
 
-GameController::State GameController::state() const { return m_state; }
-Board* GameController::board() { return m_board; }
-Snake* GameController::playerSnake() { return m_playerSnake; }
-int GameController::score() const { return m_score; }
+    m_render->update(m_state);
+    m_input->update(m_state);
+    m_move->update(m_state);
+    m_collision->update(m_state);
+    m_food->update(m_state);
 
-void GameController::tick() {
-    if (!m_board || !m_playerSnake) return;
-    if (m_state != State::Playing) return;
-
-    m_playerSnake->move();
-
-    if (m_board->checkWallCollision(*m_playerSnake) ||
-        m_playerSnake->checkSelfCollision()) {
+    if (m_state.gameOver) {
         m_timer->stop();
-        m_state = State::GameOver;
-        emit stateChanged(m_state);
-        LOG_INFO("GameController", "Game over, score=" + std::to_string(m_score));
-        return;
+        m_phase = State::GameOver;
+        emit stateChanged(m_phase);
+        emit scoreChanged(m_state.score);
+        LOG_INFO("GameController", "State: Playing -> GameOver, score=" + std::to_string(m_state.score));
     }
-
-    if (m_board->checkFoodCollision(*m_playerSnake)) {
-        m_playerSnake->grow();
-        m_score += m_board->food().points;
-        emit scoreChanged(m_score);
-        m_board->spawnFood(m_playerSnake);
-    }
-
-    std::vector<Snake*> snakes = {m_playerSnake};
-    m_scene->syncFromBoard(*m_board, snakes);
 }

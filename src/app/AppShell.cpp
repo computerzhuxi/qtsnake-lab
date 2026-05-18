@@ -2,6 +2,7 @@
 #include "MainMenuWidget.h"
 #include "GamePage.h"
 #include "SettingsWidget.h"
+#include "components/InputComponent.h"
 #include "Logger.h"
 #include <QVBoxLayout>
 #include <QKeyEvent>
@@ -102,6 +103,7 @@ void AppShell::startSinglePlayer() {
 
     delete m_controller;
     m_controller = new GameController(m_gamePage->scene(), this);
+    m_inputComponent = m_controller->input();
 
     connect(m_controller, &GameController::stateChanged,
             this, &AppShell::onControllerStateChanged);
@@ -129,10 +131,10 @@ void AppShell::keyPressEvent(QKeyEvent* event) {
 
     if (m_controller->state() == GameController::State::Playing) {
         switch (event->key()) {
-            case Qt::Key_Up:    m_controller->handleKeyPress(Direction::Up);    break;
-            case Qt::Key_Down:  m_controller->handleKeyPress(Direction::Down);  break;
-            case Qt::Key_Left:  m_controller->handleKeyPress(Direction::Left);  break;
-            case Qt::Key_Right: m_controller->handleKeyPress(Direction::Right); break;
+            case Qt::Key_Up:    m_inputComponent->setDirection(Direction::Up);    break;
+            case Qt::Key_Down:  m_inputComponent->setDirection(Direction::Down);  break;
+            case Qt::Key_Left:  m_inputComponent->setDirection(Direction::Left);  break;
+            case Qt::Key_Right: m_inputComponent->setDirection(Direction::Right); break;
             case Qt::Key_Escape:
                 m_controller->pause();
                 m_gamePage->showPause();
@@ -156,8 +158,8 @@ void AppShell::onControllerStateChanged(GameController::State state) {
             m_gamePage->showCountdown(-1);
             break;
         case GameController::State::GameOver: {
-            auto* snake = m_controller->playerSnake();
-            int len = snake ? static_cast<int>(snake->body().size()) : 0;
+            const auto& gs = m_controller->gameState();
+            int len = gs.snakes.empty() ? 0 : static_cast<int>(gs.snakes[0].body().size());
             m_gamePage->showGameOver(m_currentScore, len, 0, 0);
             break;
         }

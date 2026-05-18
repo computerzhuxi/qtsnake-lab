@@ -95,29 +95,3 @@ TEST(Snake, growIncreasesLength) {
     snake.move();
     EXPECT_EQ(snake.body().size(), oldLen + 1);
 }
-
-TEST(Snake, noSelfCollisionInitially) {
-    Snake snake(Point{5, 5});
-    EXPECT_FALSE(snake.checkSelfCollision());
-}
-
-TEST(Snake, selfCollisionWhenHeadHitsBody) {
-    // 蛇向右走6步，增长6段→然后右下左上的圈回到身体位置
-    Snake snake(Point{5, 5}, Direction::Right);
-    for (int i = 0; i < 6; ++i) { snake.grow(); snake.move(); }
-    // body: [(11,5),(10,5),(9,5),(8,5),(7,5),(6,5),(5,5),(4,5),(3,5)]
-
-    snake.setDirection(Direction::Down);
-    snake.move(); // (11,6)
-    snake.move(); // (11,7)
-
-    snake.setDirection(Direction::Left);
-    snake.move(); // (10,7)
-    snake.move(); // (9,7)
-
-    snake.setDirection(Direction::Up);
-    snake.move(); // (9,6)
-    snake.move(); // (9,5) — 撞到第8节身体 (9,5)
-
-    EXPECT_TRUE(snake.checkSelfCollision());
-}

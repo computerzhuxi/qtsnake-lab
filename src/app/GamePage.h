@@ -10,7 +10,10 @@ class PauseWidget;
 class GameOverWidget;
 class QLabel;
 
-/// \brief 游戏页面：GameView底层 + 暂停/结算/倒计时浮层
+/// \brief 游戏页面
+/// \details GameView 底层 + 三个浮层（暂停/结算/倒计时）。
+///          enter() 清空场景，exit() 清空场景并隐藏所有浮层。
+
 class GamePage : public QWidget {
     Q_OBJECT
 public:
@@ -18,7 +21,6 @@ public:
 
     GameScene* scene() const;
     GameView* view() const;
-    void setController(GameController* ctrl);
 
     void enter();
     void exit();
@@ -27,9 +29,6 @@ public:
     void showGameOver(int score, int length, int kills, int seconds);
     void showCountdown(int number);
     void hideAllOverlays();
-
-    PauseWidget* pauseWidget() const;
-    GameOverWidget* gameOverWidget() const;
 
 signals:
     void resumeClicked();
@@ -42,11 +41,11 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private:
-    GameScene* m_scene;
-    GameView* m_view;
-    PauseWidget* m_pauseWidget;
-    GameOverWidget* m_gameOver;
-    QLabel* m_countdownLabel;
+    GameScene* m_scene;                     ///< 渲染场景
+    GameView* m_view;                       ///< 渲染视口
+    PauseWidget* m_pauseWidget;             ///< 暂停浮层
+    GameOverWidget* m_gameOver;             ///< 结算浮层
+    QLabel* m_countdownLabel;               ///< 倒计时/提示文字
 };
 
 #endif // SNAKE_APP_GAMEPAGE_H

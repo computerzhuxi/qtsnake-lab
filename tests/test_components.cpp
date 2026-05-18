@@ -1,0 +1,176 @@
+#include <gtest/gtest.h>
+#include "GameState.h"
+#include "components/MoveComponent.h"
+#include "components/CollisionComponent.h"
+#include "components/FoodComponent.h"
+#include "Snake.h"
+
+// ========== MoveComponent ==========
+
+TEST(MoveComponent, initBuildsCorrectFreeCells) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    MoveComponent move;
+    move.init(s);
+    EXPECT_EQ(s.board.freeCells.size(), 100 - 3);
+}
+
+TEST(MoveComponent, growDoesNotAddTail) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    MoveComponent move;
+    move.init(s);
+
+    s.snakes[0].grow();
+    size_t oldSize = s.board.freeCells.size();
+
+    move.update(s);
+
+    // 增长了：旧尾不加回，新头不移除（留给 CollisionComponent）
+    // 空闲集大小不变
+    EXPECT_EQ(s.board.freeCells.size(), oldSize);
+}
+
+TEST(MoveComponent, updateAddsTailNotHead) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    MoveComponent move;
+    move.init(s);
+
+    size_t oldSize = s.board.freeCells.size();
+    Point oldTail = s.snakes[0].body().back();
+    Point oldHead = s.snakes[0].head();
+
+    move.update(s);
+
+    // 旧尾加回空闲集
+    EXPECT_TRUE(s.board.freeCells.count(oldTail));
+
+    // 新头还在空闲集（等 CollisionComponent 移除，+1）
+    EXPECT_TRUE(s.board.freeCells.count(s.snakes[0].head()));
+
+    // 旧头移为身体段，不在空闲集
+    EXPECT_FALSE(s.board.freeCells.count(oldHead));
+
+    // 大小：旧尾+1，新头未移除 = oldSize + 1
+    EXPECT_EQ(s.board.freeCells.size(), oldSize + 1);
+}
+
+// ========== CollisionComponent ==========
+
+TEST(CollisionComponent, headInFreeCellsIsSafe) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    MoveComponent move;
+    move.init(s);
+    s.board.foodPos = Point{8, 8};
+    s.board.freeCells.erase(Point{8, 8});
+
+    move.update(s);
+    CollisionComponent coll;
+    coll.update(s);
+    EXPECT_FALSE(s.gameOver);
+}
+
+TEST(CollisionComponent, headOnFoodIsSafe) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    MoveComponent move;
+    move.init(s);
+    s.board.foodPos = Point{6, 5};
+    s.board.freeCells.erase(Point{6, 5});
+
+    move.update(s);
+    CollisionComponent coll;
+    coll.update(s);
+    EXPECT_FALSE(s.gameOver);
+}
+
+TEST(CollisionComponent, headOutsideBoardIsDead) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{9, 5});
+    MoveComponent move;
+    move.init(s);
+    s.board.foodPos = Point{0, 0};
+    s.board.freeCells.erase(Point{0, 0});
+
+    s.snakes[0].setDirection(Direction::Right);
+    move.update(s);
+    CollisionComponent coll;
+    coll.update(s);
+    EXPECT_TRUE(s.gameOver);
+}
+
+TEST(CollisionComponent, headOnSnakeBodyIsDead) {
+    // 蛇移动后头撞到自己身体（手工移除目标格模拟）
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    s.board.foodPos = Point{0, 0};
+    s.board.freeCells.erase(Point{0, 0});
+
+    MoveComponent move;
+    move.init(s);
+
+    // 把 (6,5) 从空闲集移除（模拟身体占据）
+    s.board.freeCells.erase(Point{6, 5});
+
+    move.update(s);  // head → (6,5)
+    CollisionComponent coll;
+    coll.update(s);  // 不在空闲集且不是食物 → 死亡
+    EXPECT_TRUE(s.gameOver);
+}
+
+// ========== FoodComponent ==========
+
+TEST(FoodComponent, initSpawnsFoodInsideFreeCells) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    MoveComponent move;
+    move.init(s);
+    FoodComponent food;
+    food.init(s);
+    EXPECT_FALSE(s.board.freeCells.count(s.board.foodPos));
+}
+
+TEST(FoodComponent, eatingFoodGrowsSnakeAndSpawnsNew) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5});
+    MoveComponent move;
+    move.init(s);
+    FoodComponent foodComp;
+    foodComp.init(s);
+
+    s.board.freeCells.insert(s.board.foodPos);
+    s.board.foodPos = Point{6, 5};
+    s.board.freeCells.erase(Point{6, 5});
+
+    int oldLen = s.snakes[0].body().size();
+    int oldScore = s.score;
+
+    move.update(s);
+    foodComp.update(s);
+
+    move.update(s);
+    EXPECT_GT(s.snakes[0].body().size(), oldLen);
+    EXPECT_GT(s.score, oldScore);
+    EXPECT_NE(s.board.foodPos, Point(6, 5));
+    EXPECT_FALSE(s.board.freeCells.count(s.board.foodPos));
+}

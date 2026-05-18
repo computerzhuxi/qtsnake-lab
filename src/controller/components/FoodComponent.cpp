@@ -1,8 +1,8 @@
 #include "FoodComponent.h"
 
-FoodComponent::FoodComponent() {
-    std::random_device rd;
-    m_rng.seed(rd());
+FoodComponent::FoodComponent(RngService* rng)
+    : m_rng(rng)
+{
 }
 
 void FoodComponent::init(GameState& state) {
@@ -21,15 +21,11 @@ void FoodComponent::update(GameState& state) {
     }
 }
 
-void FoodComponent::setSeed(unsigned int seed) {
-    m_rng.seed(seed == 0 ? std::random_device{}() : seed);
-}
-
 void FoodComponent::spawnFood(GameState& state) {
     auto& b = state.board;
     if (b.freeCells.empty()) return;
     auto it = b.freeCells.begin();
-    int target = std::uniform_int_distribution<int>(0, (int)b.freeCells.size() - 1)(m_rng);
+    int target = m_rng->intInRange(0, static_cast<int>(b.freeCells.size()) - 1);
     std::advance(it, target);
     b.foodPos = *it;
     b.freeCells.erase(it);

@@ -16,7 +16,10 @@
   - `src/controller/components/FoodComponent.cpp`
   - `src/controller/GameController.h`
   - `src/controller/GameController.cpp`
-  - `tests/test_components.cpp`（用例适配）
+  - `tests/test_components.cpp`（用例适配 + RngService 确定性测试）
+  - `tests/test_game_controller.cpp`（**追加** GameController.setSeed 确定性测试；T-02 已建立此文件）
+
+> 修订记录：v0.2（2026-05-18）补加 `tests/test_game_controller.cpp` 到授权清单。原 v0.1 漏列，与"验收标准"要求新增 GameController 确定性测试不闭合，主程补正。
 - **不得修改其他模块**（ui / app / logging / audio）。
 
 ## 输出约束

@@ -4,6 +4,7 @@
 #include "components/CollisionComponent.h"
 #include "components/FoodComponent.h"
 #include "components/RenderComponent.h"
+#include "RngService.h"
 #include "GameScene.h"
 #include "Logger.h"
 
@@ -14,7 +15,8 @@ GameController::GameController(GameScene* scene)
     , m_input(std::make_unique<InputComponent>())
     , m_move(std::make_unique<MoveComponent>())
     , m_collision(std::make_unique<CollisionComponent>())
-    , m_food(std::make_unique<FoodComponent>())
+    , m_rng(std::make_unique<RngService>())
+    , m_food(std::make_unique<FoodComponent>(m_rng.get()))
     , m_render(std::make_unique<RenderComponent>(scene))
 {
     connect(m_timer, &QTimer::timeout, this, &GameController::update);
@@ -32,11 +34,7 @@ void GameController::startGame(int boardW, int boardH, int speedMs) {
     m_state.board.width = boardW;
     m_state.board.height = boardH;
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dx(0, boardW - 1);
-    std::uniform_int_distribution<int> dy(0, boardH - 1);
-    Point spawn(dx(gen), dy(gen));
+    Point spawn(m_rng->intInRange(0, boardW - 1), m_rng->intInRange(0, boardH - 1));
 
     struct { Direction d; int ox; int oy; } checks[] = {
         {Direction::Right, -1, 0}, {Direction::Left, 1, 0},
@@ -48,7 +46,7 @@ void GameController::startGame(int boardW, int boardH, int speedMs) {
             spawn.y + c.oy * 2 >= 0 && spawn.y + c.oy * 2 < boardH)
             safe[cnt++] = c.d;
     }
-    Direction dir = cnt > 0 ? safe[std::uniform_int_distribution<int>(0, cnt - 1)(gen)] : Direction::Right;
+    Direction dir = cnt > 0 ? safe[m_rng->intInRange(0, cnt - 1)] : Direction::Right;
 
     m_state.snakes.emplace_back(spawn, dir);
 
@@ -66,6 +64,15 @@ void GameController::initComponents() {
     m_input->init(m_state);
     m_move->init(m_state);
     m_food->init(m_state);
+}
+
+void GameController::setSeed(unsigned s) {
+    if (m_phase != State::Idle) {
+        LOG_WARN("GameController", "setSeed ignored: not in Idle");
+        return;
+    }
+    m_rng->seed(s);
+    LOG_INFO("GameController", "setSeed: " + std::to_string(s));
 }
 
 void GameController::handleReadyKey() {

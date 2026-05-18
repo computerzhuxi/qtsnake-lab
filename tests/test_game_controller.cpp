@@ -61,3 +61,24 @@ TEST(GameController, repeatedHandleReadyKeyDoesNotStack) {
 
     EXPECT_LE(tickCount, 4);
 }
+
+// ========== Test C: setSeed produces deterministic start ==========
+
+TEST(GameController, setSeedProducesDeterministicStart) {
+    GameScene scene1;
+    GameController c1(&scene1);
+    c1.setSeed(42);
+    c1.startGame(10, 10, 100);
+
+    GameScene scene2;
+    GameController c2(&scene2);
+    c2.setSeed(42);
+    c2.startGame(10, 10, 100);
+
+    const auto& gs1 = c1.gameState();
+    const auto& gs2 = c2.gameState();
+
+    EXPECT_EQ(gs1.board.foodPos, gs2.board.foodPos);
+    EXPECT_EQ(gs1.snakes[0].head(), gs2.snakes[0].head());
+    EXPECT_EQ(gs1.snakes[0].body(), gs2.snakes[0].body());
+}

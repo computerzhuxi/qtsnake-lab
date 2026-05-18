@@ -12,6 +12,7 @@ class MoveComponent;
 class CollisionComponent;
 class FoodComponent;
 class RenderComponent;
+class RngService;
 
 /// \brief 游戏控制器（循环驱动器）
 /// \details 持有 QTimer + 5 个游戏组件。
@@ -40,6 +41,9 @@ public:
 
     /// \brief 重置：停止 timer + 清空 GameState → Idle
     void reset();
+
+    /// \brief 注入随机种子（仅 Idle 状态生效；0=真随机）
+    void setSeed(unsigned s);
 
     /// \brief 处理准备键（Ready 状态 → 启动 3-2-1 倒计时）
     void handleReadyKey();
@@ -70,6 +74,7 @@ private:
     std::unique_ptr<InputComponent> m_input;         ///< 键盘输入
     std::unique_ptr<MoveComponent> m_move;           ///< 蛇移动 + 空闲格
     std::unique_ptr<CollisionComponent> m_collision; ///< 碰撞检测
+    std::unique_ptr<RngService> m_rng;               ///< 集中随机数服务（须在 m_food 前）
     std::unique_ptr<FoodComponent> m_food;           ///< 食物管理
     std::unique_ptr<RenderComponent> m_render;       ///< 渲染同步
 

@@ -30,7 +30,7 @@
 | T-0b | 热修复：AppShell::keyPressEvent ESC 直接穿透（BUG-1） | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | 快照方案 A 落地；日志验证 Playing⇄Paused 切换正常 |
 | T-0a | 热修复：CMakeLists 启用 AUTORCC（QSS 资源入包） | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | 方案 A 落地；用户确认日志无 QSS WARN |
 | T-02 | 修复倒计时定时器悬空风险 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | 成员化 QTimer + Qt 父子托管 + stop()/disconnect/connect 链；新增 2 个测试用例 |
-| T-03 | 引入 `RngService`，集中随机性 | `pending` | — | — | — | 前置 T-02 已通过，可启动 |
+| T-03 | 引入 `RngService`，集中随机性 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | header-only RngService；FoodComponent + startGame 全部走 m_rng；setSeed 仅 Idle；静态扫描 `<random>` 仅命中 1 处；新增 2 测试 |
 | T-04 | 修复 `Point` 哈希 | `pending` | — | — | — | 独立 |
 | T-05 | 统一蛇方向防护，移除双重逻辑 | `pending` | — | — | — | 独立 |
 | T-06 | 文档澄清"死亡帧渲染策略" | `pending` | — | — | — | 独立 |
@@ -47,6 +47,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-18 | T-03 | **通过（passed）** | RngService 集中随机性；FoodComponent 接口变更；GameController 成员/初始化顺序正确（m_rng 先于 m_food）；setSeed 仅 Idle 生效；静态扫描 `#include <random>` 仅命中 src/core/RngService.h；新增 2 个测试。MINOR-1 与 TC-DEFECT-1 见风险/遗留 |
 | 2026-05-18 | git 补救 | 提交 `5b03cd7` | `chore(phase-2)` 合并 commit，包含 T-01/T-0a/T-0b/T-02 全部源码与 Phase-2 文档基建；T-03 起一卡一 commit |
 | 2026-05-18 | T-02 | **通过（passed）** | 成员化 `m_countdownTimer`（Qt 父子托管）；`handleReadyKey` 走 stop→disconnect→connect→start 链；`reset()` 显式 stop；新增 2 用例全绿；用户手工冒烟 ESC 返主菜单 ×10 无崩溃。观察 TEST-1/TEST-2 移交 T-09 强化 |
 | 2026-05-18 | T-0a | **通过（passed）** | 方案 A（`set(CMAKE_AUTORCC ON)`）落地；构建日志显示 `qrc_resources.cpp` 已编译入 exe（~491KB）；用户确认运行日志无 QSS WARN |
@@ -69,6 +70,9 @@
 | 2026-05-18 | `RngService` 牵动多模块 | 编译错误连锁 | T-03 范围已锁定，FoodComponent 旧 `setSeed` 接口同步删除 | 监控中 |
 | 2026-05-18 | TEST-1：`test_game_controller.cpp` 用全局静态 `QApplication`，依赖链接器把它在 `gtest_main` 的 main() 之前调起 | 在某些工具链上脆弱 | T-09 强化：迁移到 `::testing::Environment` 子类或自定义 main | 监控中 |
 | 2026-05-18 | TEST-2：`repeatedHandleReadyKeyDoesNotStack` 仅靠 Ready-state 早退路径间接验证防叠加，未真测 disconnect | 未来若放开 handleReadyKey 在 Countdown 下重启，此用例无法捕获叠加 | T-09 补强：构造能强制重连的路径并断言 disconnect 起效 | 监控中 |
+| 2026-05-18 | TEST-3：`tests/CMakeLists.txt` 未将 `test_board.cpp` 加入 `test_core` 源列表，Board 模块 4 个用例**根本未在 CI 跑** | Board 数据层回归无保护 | T-09 顺手追加，归入"补齐测试覆盖"语义 | 监控中 |
+| 2026-05-18 | TC-DEFECT-1：T-03 Task Card "输入约束" 漏列 `tests/test_game_controller.cpp`，但"验收标准"要求新增测试 | Task Card 字面不闭合 | 我（主程）补一行授权（见下方"遗留问题"中 TC-DEFECT-1 条） | 已修复 |
+| 2026-05-18 | MINOR-1：T-03 确定性测试只比对首颗食物 + head + body（substantively 等价"前 10 颗食物"） | 测试强度略弱 | T-09 可加 "10 颗食物循环模拟" 用例（需要事件循环），择机 | 监控中 |
 
 ---
 

@@ -3,6 +3,7 @@
 #include "components/MoveComponent.h"
 #include "components/CollisionComponent.h"
 #include "components/FoodComponent.h"
+#include "RngService.h"
 #include "Snake.h"
 
 // ========== MoveComponent ==========
@@ -143,7 +144,8 @@ TEST(FoodComponent, initSpawnsFoodInsideFreeCells) {
     s.snakes.emplace_back(Point{5, 5});
     MoveComponent move;
     move.init(s);
-    FoodComponent food;
+    RngService rng;
+    FoodComponent food(&rng);
     food.init(s);
     EXPECT_FALSE(s.board.freeCells.count(s.board.foodPos));
 }
@@ -155,7 +157,8 @@ TEST(FoodComponent, eatingFoodGrowsSnakeAndSpawnsNew) {
     s.snakes.emplace_back(Point{5, 5});
     MoveComponent move;
     move.init(s);
-    FoodComponent foodComp;
+    RngService rng2;
+    FoodComponent foodComp(&rng2);
     foodComp.init(s);
 
     s.board.freeCells.insert(s.board.foodPos);
@@ -173,4 +176,16 @@ TEST(FoodComponent, eatingFoodGrowsSnakeAndSpawnsNew) {
     EXPECT_GT(s.score, oldScore);
     EXPECT_NE(s.board.foodPos, Point(6, 5));
     EXPECT_FALSE(s.board.freeCells.count(s.board.foodPos));
+}
+
+// ========== RngService ==========
+
+TEST(RngService, sameSeedProducesIdenticalSequence) {
+    RngService a;
+    RngService b;
+    a.seed(42);
+    b.seed(42);
+    for (int i = 0; i < 10; ++i) {
+        EXPECT_EQ(a.intInRange(0, 99), b.intInRange(0, 99));
+    }
 }

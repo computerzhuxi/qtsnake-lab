@@ -130,7 +130,8 @@ tests/test_components.cpp::FoodComponent.* (adapted, pass)
 ### 11.2 提交时机
 
 - 开发 Agent **不直接 commit**——按 AGENTS §7 三段格式提交完整报告即可。
-- 主程在审查通过后，由主程执行 `git add` + `git commit`，并在 `docs/progress.md` 审查记录中追加该 commit 的短 hash。
+- 主程在审查通过后，由主程执行 `git add` + `git commit`。
+- 不再向 `docs/progress.md` 回填 commit 短 hash——`git log` 即真实来源；commit message footer 已含 `任务卡:` 与 `审查通过:` 元数据，`git log --grep="T-XX"` 一行即可检索。
 - 提交者身份：仓库 `git config user.name/email` 已配置；主程不修改 git config。
 
 ### 11.3 Commit Message 格式

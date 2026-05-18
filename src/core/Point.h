@@ -24,7 +24,9 @@ namespace std {
     template<>
     struct hash<Point> {
         size_t operator()(const Point& p) const {
-            return hash<int>()(p.x) ^ (hash<int>()(p.y) << 1);
+            size_t h1 = hash<int>()(p.x);
+            size_t h2 = hash<int>()(p.y);
+            return h1 ^ (h2 + 0x9e3779b97f4a7c15ULL + (h1 << 6) + (h1 >> 2));
         }
     };
 }

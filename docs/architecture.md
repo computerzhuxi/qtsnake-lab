@@ -138,7 +138,7 @@ Idle → Ready → Countdown → Playing → GameOver
 - **State 数据架构**：Board/GameState 纯数据，Controller 逻辑，联机/回放直接存 State 快照
 - **组件化 Controller**：5 个独立组件 (Input/Move/Collision/Food/Render)，unique_ptr 持有
 - **空闲集统一碰撞**：撞墙/自撞/撞他蛇 统一用 freeCells 判断，无需 Snake::checkSelfCollision
-- **Render 最先执行**：渲染上一帧，死亡帧永远不会被渲染
+- **死亡帧策略**：`RenderComponent` 在 `update()` 序列首位执行，渲染的是"上一 tick 结束态"。当某帧发生碰撞（`MoveComponent` 已把头推入非法格、`CollisionComponent` 标记 `gameOver`），该帧不会再被渲染一次，因此玩家屏幕停留在撞墙前的最后合法位置。这是有意为之的 UX，避免显示蛇头与墙体重合的画面。
 - **Qt5 Widgets + QGraphicsView**：成熟稳定
 - **QSS 全局样式**：暗色电竞风
 - **异步日志**：后台线程 + 消息队列

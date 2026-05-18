@@ -94,4 +94,8 @@ void GamePage::resizeEvent(QResizeEvent* event) {
     m_pauseWidget->setGeometry(0, 0, w, h);
     m_gameOver->setGeometry(0, 0, w, h);
     m_countdownLabel->setGeometry(0, 0, w, h);
+
+    if (m_scene && !m_scene->sceneRect().isEmpty()) {
+        m_view->fitInView(m_scene->sceneRect(), Qt::KeepAspectRatio);
+    }
 }

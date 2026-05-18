@@ -36,7 +36,7 @@
 | T-06 | 文档澄清"死亡帧渲染策略" | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | architecture.md/design.md/RenderComponent.h 三处一致；纯文档无源码变更 |
 | T-0c | 热修复：清空 src/app/ 全部 setStyleSheet | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet = 0 |
 | T-07 | QSS 集中化（清除内联样式） | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | GamePage setStyleSheet 清零；三态走 property+QSS；MainMenuWidget/GameOverWidget 遗留 |
-| T-08 | 视图自适应（resize fitInView） | `pending` | — | — | — | 独立 |
+| T-08 | 视图自适应（resize fitInView） | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | resizeEvent 追加 fitInView+KeepAspectRatio；仅 4 行 |
 | T-09 | 新增测试套件 `test_game_controller.cpp` | `pending` | — | — | — | 前置 T-01 / T-02 / T-03 |
 | T-10 | 工程门面：README + SnakeServer 占位 + 编译警告 | `pending` | — | — | — | 收尾 |
 
@@ -48,6 +48,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-18 | T-08 | **通过（passed）** | resizeEvent 末尾追加 fitInView + KeepAspectRatio；m_scene / isEmpty 双重守卫；仅 4 行；31 测试全绿 |
 | 2026-05-18 | T-0c | **通过（passed）** | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet 命中数 = 0；AGENTS.md §5.3 全面达标 |
 | 2026-05-18 | T-07 | **通过（passed）** | GamePage setStyleSheet 清零；三态走 setProperty + QSS 属性选择器；31 测试全绿；MainMenuWidget/GameOverWidget 遗留进入跟踪 |
 | 2026-05-18 | T-06 | **通过（passed）** | 纯文档：architecture.md 死亡帧策略段落 / design.md §4.4 / RenderComponent.h 头注释三处一致；31 测试全绿 |

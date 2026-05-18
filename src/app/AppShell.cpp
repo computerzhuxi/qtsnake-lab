@@ -11,8 +11,6 @@ AppShell::AppShell(QWidget* parent) : QWidget(parent) {
     setWindowTitle("Snake Arena");
     setMinimumSize(800, 600);
 
-    m_controller = nullptr;
-
     setupUI();
 
     // 主菜单信号
@@ -51,10 +49,6 @@ AppShell::AppShell(QWidget* parent) : QWidget(parent) {
     setFocus();
 }
 
-AppShell::~AppShell() {
-    delete m_controller;
-}
-
 void AppShell::setupUI() {
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -79,8 +73,7 @@ void AppShell::resizeEvent(QResizeEvent* event) {
 
 void AppShell::showMenu() {
     m_gamePage->exit();
-    delete m_controller;
-    m_controller = nullptr;
+    m_controller.reset();
     m_stack->setCurrentIndex(0);
     m_mainMenu->enter();
     m_settingsWidget->hide();
@@ -101,15 +94,13 @@ void AppShell::showSettings() {
 void AppShell::startSinglePlayer() {
     showGame();
 
-    delete m_controller;
-    m_controller = new GameController(m_gamePage->scene(), this);
-    m_inputComponent = m_controller->input();
+    m_controller = std::make_unique<GameController>(m_gamePage->scene());
 
-    connect(m_controller, &GameController::stateChanged,
+    connect(m_controller.get(), &GameController::stateChanged,
             this, &AppShell::onControllerStateChanged);
-    connect(m_controller, &GameController::countdownTick,
+    connect(m_controller.get(), &GameController::countdownTick,
             this, &AppShell::onCountdownTick);
-    connect(m_controller, &GameController::scoreChanged, this, [this](int score) {
+    connect(m_controller.get(), &GameController::scoreChanged, this, [this](int score) {
         m_currentScore = score;
     });
 
@@ -124,17 +115,19 @@ void AppShell::keyPressEvent(QKeyEvent* event) {
         return;
     }
 
-    if (m_controller->state() == GameController::State::Ready) {
+    const auto state = m_controller->state();
+
+    if (state == GameController::State::Ready) {
         m_controller->handleReadyKey();
         return;
     }
 
-    if (m_controller->state() == GameController::State::Playing) {
+    if (state == GameController::State::Playing) {
         switch (event->key()) {
-            case Qt::Key_Up:    m_inputComponent->setDirection(Direction::Up);    break;
-            case Qt::Key_Down:  m_inputComponent->setDirection(Direction::Down);  break;
-            case Qt::Key_Left:  m_inputComponent->setDirection(Direction::Left);  break;
-            case Qt::Key_Right: m_inputComponent->setDirection(Direction::Right); break;
+            case Qt::Key_Up:    m_controller->input()->setDirection(Direction::Up);    break;
+            case Qt::Key_Down:  m_controller->input()->setDirection(Direction::Down);  break;
+            case Qt::Key_Left:  m_controller->input()->setDirection(Direction::Left);  break;
+            case Qt::Key_Right: m_controller->input()->setDirection(Direction::Right); break;
             case Qt::Key_Escape:
                 m_controller->pause();
                 m_gamePage->showPause();
@@ -142,7 +135,7 @@ void AppShell::keyPressEvent(QKeyEvent* event) {
         }
     }
 
-    if (m_controller->state() == GameController::State::Paused) {
+    if (state == GameController::State::Paused) {
         if (event->key() == Qt::Key_Escape) {
             m_controller->resume();
             m_gamePage->hideAllOverlays();

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QStackedWidget>
+#include <memory>
 #include "GameController.h"
 #include "GameView.h"
 #include "GameScene.h"
@@ -10,8 +11,6 @@
 class MainMenuWidget;
 class GamePage;
 class SettingsWidget;
-class InputComponent;
-
 /// \brief 应用外壳（顶层窗口）
 /// \details 使用 QStackedWidget 管理两个页面：
 ///          - Page 0: 主菜单
@@ -22,7 +21,6 @@ class AppShell : public QWidget {
     Q_OBJECT
 public:
     explicit AppShell(QWidget* parent = nullptr);
-    ~AppShell();
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
@@ -43,9 +41,8 @@ private:
     MainMenuWidget* m_mainMenu;             ///< 主菜单页面
     GamePage* m_gamePage;                   ///< 游戏页面
     SettingsWidget* m_settingsWidget;       ///< 全局设置浮层
-    GameController* m_controller = nullptr; ///< 当前游戏控制器（无游戏时为 nullptr）
-    InputComponent* m_inputComponent = nullptr; ///< 输入组件
-    int m_currentScore = 0;                 ///< 当前分数
+    std::unique_ptr<GameController> m_controller; ///< 当前游戏控制器（无游戏时为 nullptr）
+    int m_currentScore = 0;                       ///< 当前分数
 };
 
 #endif // SNAKE_APP_APPSHELL_H

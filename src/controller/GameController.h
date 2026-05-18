@@ -26,7 +26,8 @@ class GameController : public QObject {
 public:
     enum class State { Idle, Ready, Countdown, Playing, Paused, GameOver };
 
-    explicit GameController(GameScene* scene, QObject* parent = nullptr);
+    explicit GameController(GameScene* scene);
+    ~GameController() override;
 
     /// \brief 开始新一局：创建 GameState + 随机出生蛇 + 初始化组件
     void startGame(int boardW = 20, int boardH = 20, int speedMs = 100);
@@ -64,6 +65,7 @@ private:
     void initComponents();
 
     QTimer* m_timer;                                ///< 主循环定时器
+    QTimer* m_countdownTimer = nullptr;             ///< 倒计时定时器（3-2-1）
 
     std::unique_ptr<InputComponent> m_input;         ///< 键盘输入
     std::unique_ptr<MoveComponent> m_move;           ///< 蛇移动 + 空闲格

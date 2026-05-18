@@ -7,9 +7,10 @@
 #include "GameScene.h"
 #include "Logger.h"
 
-GameController::GameController(GameScene* scene, QObject* parent)
-    : QObject(parent)
+GameController::GameController(GameScene* scene)
+    : QObject(nullptr)
     , m_timer(new QTimer(this))
+    , m_countdownTimer(new QTimer(this))
     , m_input(std::make_unique<InputComponent>())
     , m_move(std::make_unique<MoveComponent>())
     , m_collision(std::make_unique<CollisionComponent>())
@@ -18,6 +19,8 @@ GameController::GameController(GameScene* scene, QObject* parent)
 {
     connect(m_timer, &QTimer::timeout, this, &GameController::update);
 }
+
+GameController::~GameController() = default;
 
 void GameController::startGame(int boardW, int boardH, int speedMs) {
     m_boardW = boardW;
@@ -74,22 +77,23 @@ void GameController::handleReadyKey() {
     emit stateChanged(m_phase);
     emit countdownTick(m_countdownValue);
 
-    auto* ct = new QTimer(this);
-    ct->setInterval(700);
-    connect(ct, &QTimer::timeout, this, [this, ct]() {
+    m_countdownTimer->stop();
+    disconnect(m_countdownTimer, &QTimer::timeout, nullptr, nullptr);
+    m_countdownTimer->setInterval(700);
+    connect(m_countdownTimer, &QTimer::timeout, this, [this]() {
         m_countdownValue--;
         if (m_countdownValue > 0) {
             emit countdownTick(m_countdownValue);
         } else {
             emit countdownTick(0);
-            ct->stop(); ct->deleteLater();
+            m_countdownTimer->stop();
             m_phase = State::Playing;
             emit stateChanged(m_phase);
             m_timer->start();
             LOG_INFO("GameController", "State: Countdown -> Playing");
         }
     });
-    ct->start();
+    m_countdownTimer->start();
 }
 
 void GameController::pause() {
@@ -111,6 +115,7 @@ void GameController::resume() {
 void GameController::reset() {
     LOG_INFO("GameController", "State: -> Idle (reset)");
     m_timer->stop();
+    m_countdownTimer->stop();
     m_state = GameState{};
     m_phase = State::Idle;
     emit stateChanged(m_phase);

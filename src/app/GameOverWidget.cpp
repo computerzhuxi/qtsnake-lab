@@ -10,7 +10,7 @@ GameOverWidget::GameOverWidget(QWidget* parent) : QWidget(parent) {
     layout->setAlignment(Qt::AlignCenter);
 
     auto* title = new QLabel(tr("游戏结束"), this);
-    title->setStyleSheet("color: #ff6688; font-size: 18px; letter-spacing: 6px;");
+    title->setObjectName("gameOverTitle");
     title->setAlignment(Qt::AlignCenter);
 
     auto* scoreLabel = new QLabel(this);

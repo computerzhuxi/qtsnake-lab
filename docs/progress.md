@@ -34,6 +34,7 @@
 | T-04 | 修复 `Point` 哈希 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | boost::hash_combine 64-bit 风格；对称对哈希不等；400 点桶分布 max≤8 |
 | T-05 | 统一蛇方向防护，移除双重逻辑 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | setDirection 退化为单行；Snake 层为唯一防护；31/31 全绿 |
 | T-06 | 文档澄清"死亡帧渲染策略" | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | architecture.md/design.md/RenderComponent.h 三处一致；纯文档无源码变更 |
+| T-0c | 热修复：清空 src/app/ 全部 setStyleSheet | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet = 0 |
 | T-07 | QSS 集中化（清除内联样式） | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | GamePage setStyleSheet 清零；三态走 property+QSS；MainMenuWidget/GameOverWidget 遗留 |
 | T-08 | 视图自适应（resize fitInView） | `pending` | — | — | — | 独立 |
 | T-09 | 新增测试套件 `test_game_controller.cpp` | `pending` | — | — | — | 前置 T-01 / T-02 / T-03 |
@@ -47,6 +48,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-18 | T-0c | **通过（passed）** | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet 命中数 = 0；AGENTS.md §5.3 全面达标 |
 | 2026-05-18 | T-07 | **通过（passed）** | GamePage setStyleSheet 清零；三态走 setProperty + QSS 属性选择器；31 测试全绿；MainMenuWidget/GameOverWidget 遗留进入跟踪 |
 | 2026-05-18 | T-06 | **通过（passed）** | 纯文档：architecture.md 死亡帧策略段落 / design.md §4.4 / RenderComponent.h 头注释三处一致；31 测试全绿 |
 | 2026-05-18 | T-05 | **通过（passed）** | InputComponent::setDirection 退化为单行 m_direction = dir；Snake 层为唯一 180° 防护点；新增 2 用例验证纯缓存 + Snake 防护仍生效；31 测试全绿 |
@@ -87,5 +89,5 @@
 | AP-3 | `PauseWidget → GamePage → AppShell` 三层信号原样转发，可裁剪 | Phase-6 或专项重构 |
 | SN-2 | `Snake` 构造反向延伸 2 格无边界保护 | T-06 头注释中补充契约说明（如已包含则关闭） |
 | CM-3 | CMakeLists 缺 `CMAKE_AUTORCC ON`，导致 QSS 资源未编入 exe，运行时 `Failed to load QSS stylesheet`；当前游戏使用 Qt 默认浅色样式（与设计文档暗色 TRON 风不符）。**阻塞 T-07**。 | ✅ **T-0a 已修复（2026-05-18）** |
-| AP-4 | `MainMenuWidget.cpp` (8 处) + `GameOverWidget.cpp` (1 处) 仍使用内联 `setStyleSheet`，未纳入 T-07 输入约束。T-07 仅清除 GamePage。 | Phase-3 或独立 Task Card |
+| AP-4 | `MainMenuWidget.cpp` (8 处) + `GameOverWidget.cpp` (1 处) 仍使用内联 `setStyleSheet`，未纳入 T-07 输入约束。T-07 仅清除 GamePage。 | ✅ **T-0c 已修复（2026-05-18）** |
 | BUG-1 | `AppShell::keyPressEvent` ESC 分支存在直通穿透：Playing→Paused 后未 `return`，紧接的 `if (state == Paused)` 立即把 ESC 解释为 resume，状态在一次按键内回到 Playing。玩家**无法暂停**游戏。Pre-existing，与 T-01 无关。 | ✅ **T-0b 已修复（2026-05-18）** |

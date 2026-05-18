@@ -45,10 +45,16 @@ QLabel {
 QLabel#titleLabel {
     color: #e0e0ff;
     font-size: 28px;
+    font-family: monospace;
+    letter-spacing: 8px;
+    padding-top: 12px;
 }
 QLabel#subtitleLabel {
     color: #556;
-    font-size: 11px;
+    font-size: 9px;
+    font-family: monospace;
+    letter-spacing: 4px;
+    padding-bottom: 16px;
 }
 QLabel#scoreLabel {
     color: #00ff88;
@@ -84,3 +90,55 @@ QLabel#CountdownLabel { background: transparent; }
 QLabel#CountdownLabel[state="hint"] { font-size: 18px; color: #556; padding-bottom: 60px; }
 QLabel#CountdownLabel[state="count"] { font-size: 72px; color: #00ff88; }
 QLabel#CountdownLabel[state="go"] { font-size: 72px; color: #00ff88; }
+
+/* 主菜单装饰 */
+QWidget#decorLine {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 transparent, stop:0.5 #00ff8866, stop:1 transparent);
+    max-height: 1px;
+}
+QWidget#snakeHead {
+    background: #00ff88;
+    border-radius: 2px;
+}
+QWidget#snakeBody {
+    background: #00bb55;
+    border-radius: 2px;
+}
+QLabel#hintLabel {
+    color: #0ff;
+    font-size: 10px;
+    border: 1px solid #1a1a3e;
+    border-radius: 10px;
+    padding: 3px 12px;
+    font-family: monospace;
+}
+
+/* 主菜单底部按钮 */
+QPushButton#btnSettings {
+    background: transparent;
+    border: none;
+    color: #556;
+    font-size: 11px;
+    min-width: 0;
+    padding: 4px 12px;
+    font-family: monospace;
+}
+QPushButton#btnSettings:hover { color: #00ff88; }
+QPushButton#btnExit {
+    background: transparent;
+    border: none;
+    color: #556;
+    font-size: 11px;
+    min-width: 0;
+    padding: 4px 12px;
+    font-family: monospace;
+}
+QPushButton#btnExit:hover { color: #ff6688; }
+
+/* 结算页 */
+QLabel#gameOverTitle {
+    color: #ff6688;
+    font-size: 18px;
+    letter-spacing: 6px;
+}

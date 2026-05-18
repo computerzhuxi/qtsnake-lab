@@ -5,8 +5,9 @@
 #include "Direction.h"
 
 /// \brief 键盘输入组件
-/// \details 存储当前方向（默认 Right），update() 写入第一条蛇。
-///          自带 180° 反转防护。setDirection() 由 AppShell 在键盘事件中调用。
+/// \details 仅缓存最新方向输入（默认 Right）；update() 将缓存写入第一条蛇。
+///          180° 反转防护由 Snake::setDirection 在 update() 阶段统一执行，
+///          本组件不做任何方向校验。
 class InputComponent {
 public:
     /// \brief 从蛇同步初始方向（startGame 后调用）

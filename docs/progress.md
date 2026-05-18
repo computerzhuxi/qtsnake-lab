@@ -32,7 +32,7 @@
 | T-02 | 修复倒计时定时器悬空风险 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | 成员化 QTimer + Qt 父子托管 + stop()/disconnect/connect 链；新增 2 个测试用例 |
 | T-03 | 引入 `RngService`，集中随机性 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | header-only RngService；FoodComponent + startGame 全部走 m_rng；setSeed 仅 Idle；静态扫描 `<random>` 仅命中 1 处；新增 2 测试 |
 | T-04 | 修复 `Point` 哈希 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | boost::hash_combine 64-bit 风格；对称对哈希不等；400 点桶分布 max≤8 |
-| T-05 | 统一蛇方向防护，移除双重逻辑 | `pending` | — | — | — | 独立 |
+| T-05 | 统一蛇方向防护，移除双重逻辑 | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | setDirection 退化为单行；Snake 层为唯一防护；31/31 全绿 |
 | T-06 | 文档澄清"死亡帧渲染策略" | `pending` | — | — | — | 独立 |
 | T-07 | QSS 集中化（清除内联样式） | `pending` | — | — | — | 独立 |
 | T-08 | 视图自适应（resize fitInView） | `pending` | — | — | — | 独立 |
@@ -47,6 +47,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-18 | T-05 | **通过（passed）** | InputComponent::setDirection 退化为单行 m_direction = dir；Snake 层为唯一 180° 防护点；新增 2 用例验证纯缓存 + Snake 防护仍生效；31 测试全绿 |
 | 2026-05-18 | T-04 | **通过（passed）** | Point 哈希改 boost::hash_combine 64-bit 风格；对称对 (a,b)/(b,a) 哈希不等；400 点桶分布 max_bucket_size ≤ 8；新增 2 用例；29 测试全绿 |
 | 2026-05-18 | T-03 | **通过（passed）** | RngService 集中随机性；FoodComponent 接口变更；GameController 成员/初始化顺序正确（m_rng 先于 m_food）；setSeed 仅 Idle 生效；静态扫描 `#include <random>` 仅命中 src/core/RngService.h；新增 2 个测试。MINOR-1 与 TC-DEFECT-1 见风险/遗留 |
 | 2026-05-18 | git 补救 | 提交 `5b03cd7` | `chore(phase-2)` 合并 commit，包含 T-01/T-0a/T-0b/T-02 全部源码与 Phase-2 文档基建；T-03 起一卡一 commit |

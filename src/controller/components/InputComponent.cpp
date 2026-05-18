@@ -13,10 +13,5 @@ void InputComponent::update(GameState& state) {
 }
 
 void InputComponent::setDirection(Direction dir) {
-    if ((m_direction == Direction::Up    && dir == Direction::Down)  ||
-        (m_direction == Direction::Down  && dir == Direction::Up)    ||
-        (m_direction == Direction::Left  && dir == Direction::Right) ||
-        (m_direction == Direction::Right && dir == Direction::Left))
-        return;
     m_direction = dir;
 }

@@ -3,6 +3,7 @@
 #include "components/MoveComponent.h"
 #include "components/CollisionComponent.h"
 #include "components/FoodComponent.h"
+#include "components/InputComponent.h"
 #include "RngService.h"
 #include "Snake.h"
 
@@ -176,6 +177,37 @@ TEST(FoodComponent, eatingFoodGrowsSnakeAndSpawnsNew) {
     EXPECT_GT(s.score, oldScore);
     EXPECT_NE(s.board.foodPos, Point(6, 5));
     EXPECT_FALSE(s.board.freeCells.count(s.board.foodPos));
+}
+
+// ========== InputComponent ==========
+
+TEST(InputComponent, setDirectionOverwritesCache) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5}, Direction::Up);
+
+    InputComponent in;
+    in.init(s);
+    EXPECT_EQ(s.snakes[0].direction(), Direction::Up);
+
+    in.setDirection(Direction::Right);
+    in.update(s);
+    EXPECT_EQ(s.snakes[0].direction(), Direction::Right);
+}
+
+TEST(InputComponent, snakeReverseGuardStillEffective) {
+    GameState s;
+    s.board.width = 10;
+    s.board.height = 10;
+    s.snakes.emplace_back(Point{5, 5}, Direction::Up);
+
+    InputComponent in;
+    in.init(s);
+
+    in.setDirection(Direction::Down);
+    in.update(s);
+    EXPECT_EQ(s.snakes[0].direction(), Direction::Up);
 }
 
 // ========== RngService ==========

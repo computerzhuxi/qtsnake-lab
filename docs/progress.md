@@ -47,6 +47,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-18 | git 补救 | 提交 `5b03cd7` | `chore(phase-2)` 合并 commit，包含 T-01/T-0a/T-0b/T-02 全部源码与 Phase-2 文档基建；T-03 起一卡一 commit |
 | 2026-05-18 | T-02 | **通过（passed）** | 成员化 `m_countdownTimer`（Qt 父子托管）；`handleReadyKey` 走 stop→disconnect→connect→start 链；`reset()` 显式 stop；新增 2 用例全绿；用户手工冒烟 ESC 返主菜单 ×10 无崩溃。观察 TEST-1/TEST-2 移交 T-09 强化 |
 | 2026-05-18 | T-0a | **通过（passed）** | 方案 A（`set(CMAKE_AUTORCC ON)`）落地；构建日志显示 `qrc_resources.cpp` 已编译入 exe（~491KB）；用户确认运行日志无 QSS WARN |
 | 2026-05-18 | T-0b | **通过（passed）** | 快照方案 A 落地；`keyPressEvent` 内 `state()` 调用次数 = 1；用户日志验证 Playing⇄Paused 切换 5 次符合预期 |

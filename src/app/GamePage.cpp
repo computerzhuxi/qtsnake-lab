@@ -3,6 +3,7 @@
 #include "GameOverWidget.h"
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QStyle>
 
 GamePage::GamePage(QWidget* parent) : QWidget(parent) {
     m_scene = new GameScene(this);
@@ -17,6 +18,7 @@ GamePage::GamePage(QWidget* parent) : QWidget(parent) {
     m_gameOver = new GameOverWidget(this);
 
     m_countdownLabel = new QLabel(this);
+    m_countdownLabel->setObjectName("CountdownLabel");
     m_countdownLabel->setAlignment(Qt::AlignCenter);
     m_countdownLabel->hide();
 
@@ -55,24 +57,24 @@ void GamePage::showGameOver(int score, int length, int kills, int seconds) {
 
 void GamePage::showCountdown(int number) {
     QString text;
-    QString style;
     Qt::Alignment align;
 
     if (number == -1) {
         text = tr("按任意键开始");
-        style = "background: transparent; font-size: 18px; color: #556; padding-bottom: 60px;";
+        m_countdownLabel->setProperty("state", "hint");
         align = Qt::AlignHCenter | Qt::AlignBottom;
     } else if (number == 0) {
         text = "GO!";
-        style = "background: transparent; font-size: 72px; color: #00ff88;";
+        m_countdownLabel->setProperty("state", "go");
         align = Qt::AlignCenter;
     } else {
         text = QString::number(number);
-        style = "background: transparent; font-size: 72px; color: #00ff88;";
+        m_countdownLabel->setProperty("state", "count");
         align = Qt::AlignCenter;
     }
 
-    m_countdownLabel->setStyleSheet(style);
+    m_countdownLabel->style()->unpolish(m_countdownLabel);
+    m_countdownLabel->style()->polish(m_countdownLabel);
     m_countdownLabel->setAlignment(align);
     m_countdownLabel->setText(text);
     m_countdownLabel->show();

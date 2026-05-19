@@ -4,7 +4,7 @@
 #include <vector>
 #include "CollisionReport.h"
 
-class GameState;
+struct GameState;
 
 /// \brief 碰撞检测器抽象接口
 /// \details 纯函数：输入 const GameState&，输出 vector<CollisionReport>。

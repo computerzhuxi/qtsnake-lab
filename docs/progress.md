@@ -49,7 +49,7 @@
 | ID | 标题 | 状态 | 领卡人 | 开始 | 结束 | 备注 |
 |---|---|---|---|---|---|---|
 | T-11 | 碰撞数据结构 + 接口定义 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 文件（2 新增头 + Board 改），46 测试全绿，countdownToPlaying flaky 非本卡引入 |
-| T-12 | NaiveCollisionDetector + 测试 | `pending` | — | — | — | 依赖 T-11 |
+| T-12 | NaiveCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 6 文件变更，8 用例，54/54 全绿，算法与伪代码逐行一致 |
 | T-13 | GridCollisionDetector + 测试 | `pending` | — | — | — | 依赖 T-11 |
 | T-14 | CollisionResolver + 测试 | `pending` | — | — | — | 依赖 T-11 |
 | T-15 | MoveComponent 吸收 freeCells + FoodSpawner | `pending` | — | — | — | 依赖 T-11 |
@@ -69,7 +69,8 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
-| 2026-05-19 | T-11 | **通过（passed）** | CollisionReport.h / ICollisionDetector.h / Board.h 全部达标；46/46 全绿（countdownToPlaying 首次抖动，三次复测通过，非本卡引入） |
+| 2026-05-19 | T-12 | **通过（passed）** | NaiveCollisionDetector 算法与伪代码逐行一致；8 用例覆盖全部 7 种 CollisionType；54/54 全绿 /W4 零警告 |
+| 2026-05-19 | T-11 | **通过（passed）** | CollisionReport.h / ICollisionDetector.h / Board.h 全部达标；46/46 全绿 |
 | 2026-05-19 | T-09 | **通过（passed）** | 14 用例覆盖状态机全路径/重置/GameOver/确定性/信号契约；lambda+QVector 替代 QSignalSpy 零外链；CMakeLists.txt 无变更；42/42 全绿（21.6s） |
 | 2026-05-18 | T-08 | **通过（passed）** | resizeEvent 末尾追加 fitInView + KeepAspectRatio；m_scene / isEmpty 双重守卫；仅 4 行；31 测试全绿 |
 | 2026-05-18 | T-0c | **通过（passed）** | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet 命中数 = 0；AGENTS.md §5.3 全面达标 |

@@ -12,7 +12,7 @@
 |---|---|---|---|
 | Phase-1 基础骨架（core / ui / controller / app 主流程） | ✅ 已完成 | — / 2026-05 前 | 现有代码与测试 |
 | **Phase-2 巩固重构** | ✅ 已完成 | **2026-05-18 ~ 2026-05-19** | 10 正式 + 3 hotfix = 13 张，46 测试全绿 |
-| Phase-3 AI 对战 | ⏸ 未启动 | — | 依赖 T-03 RngService |
+| **Phase-3 打磨（UI + 碰撞重构）** | **🔄 进行中** | **2026-05-19** | 碰撞重构 6 张 + UI 6 张 = 12 张，严格串行 |
 | Phase-4 联机对战 | ⏸ 未启动 | — | 依赖 T-09 状态机测试基线 |
 | Phase-5 回放 | ⏸ 未启动 | — | 依赖 T-03 / T-09 |
 | Phase-6 i18n + 音效落地 | ⏸ 未启动 | — | 无强依赖 |
@@ -42,13 +42,34 @@
 
 ---
 
+## Phase-3 Task Card 状态板
+
+> 状态值：`pending`（待启动） / `in_progress`（进行中） / `review`（待审查） / `passed`（已通过） / `rejected`（已打回，括注次数）
+
+| ID | 标题 | 状态 | 领卡人 | 开始 | 结束 | 备注 |
+|---|---|---|---|---|---|---|
+| T-11 | 碰撞数据结构 + 接口定义 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 文件（2 新增头 + Board 改），46 测试全绿，countdownToPlaying flaky 非本卡引入 |
+| T-12 | NaiveCollisionDetector + 测试 | `pending` | — | — | — | 依赖 T-11 |
+| T-13 | GridCollisionDetector + 测试 | `pending` | — | — | — | 依赖 T-11 |
+| T-14 | CollisionResolver + 测试 | `pending` | — | — | — | 依赖 T-11 |
+| T-15 | MoveComponent 吸收 freeCells + FoodSpawner | `pending` | — | — | — | 依赖 T-11 |
+| T-16 | Controller 流水线重构 + 删旧组件 | `pending` | — | — | — | 依赖 T-12~T-15 |
+| T-17 | SnakeItem 渐变色 + 发光 | `pending` | — | — | — | — |
+| T-18 | FoodItem 光晕 + GameScene 网格线 | `pending` | — | — | — | — |
+| T-19 | InfoBar + LeaderboardWidget | `pending` | — | — | — | — |
+| T-20 | GameOverWidget 多人排名表 | `pending` | — | — | — | — |
+| T-21 | ShineLabel 反光文字 | `pending` | — | — | — | — |
+| T-22 | SettingsWidget Tab 重构 + QSS 收尾 | `pending` | — | — | — | — |
+
+---
+
 ## 审查记录
 
 > 主程在每次审查后向下追加一行（最新在上）。
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
-| 2026-05-19 | T-10 | **通过（passed）** | README 双语/W4 零警告 3 修复+ gtest /W0/SnakeServer.exe 空壳/plan.md 归档/design.md 单源声明/test_board.cpp 补链/46 全绿（21.3s） |
+| 2026-05-19 | T-11 | **通过（passed）** | CollisionReport.h / ICollisionDetector.h / Board.h 全部达标；46/46 全绿（countdownToPlaying 首次抖动，三次复测通过，非本卡引入） |
 | 2026-05-19 | T-09 | **通过（passed）** | 14 用例覆盖状态机全路径/重置/GameOver/确定性/信号契约；lambda+QVector 替代 QSignalSpy 零外链；CMakeLists.txt 无变更；42/42 全绿（21.6s） |
 | 2026-05-18 | T-08 | **通过（passed）** | resizeEvent 末尾追加 fitInView + KeepAspectRatio；m_scene / isEmpty 双重守卫；仅 4 行；31 测试全绿 |
 | 2026-05-18 | T-0c | **通过（passed）** | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet 命中数 = 0；AGENTS.md §5.3 全面达标 |

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Arena — UI Mockup v4</title>
+<style>
+  :root {
+    --bg-deep:    #06060f;
+    --bg-panel:   #0a0a1a;
+    --bg-btn:     #0d0d28;
+    --border-btn: #222255;
+    --border-hl:  #00ff88;
+    --text-main:  #ccc;
+    --text-bright:#e0e0ff;
+    --text-dim:   #556;
+    --snake-head: #00ff88;
+    --snake-body: #00bb55;
+    --food:       #ff4466;
+    --danger:     #ff6688;
+    --accent:     #0ff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #020208; color: var(--text-main);
+    font-family: "Consolas", "Courier New", monospace;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; user-select: none;
+  }
+  .stage {
+    position: relative; width: 800px; height: 600px;
+    background: var(--bg-deep);
+    border: 2px solid #111133; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 0 60px rgba(0,255,136,0.06);
+  }
+  .page { position: absolute; inset: 0; display: none; }
+  .page.active { display: block; }
+  .stage-overlay {
+    position: absolute; inset: 0; z-index: 50;
+    background: rgba(6,6,15,0.94);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stage-overlay.hidden { display: none; }
+
+  /* ---- Dev bar ---- */
+  .dev-bar {
+    position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px; z-index: 200;
+    opacity: 0.35; transition: opacity 0.2s;
+  }
+  .dev-bar:hover { opacity: 1; }
+  .dev-bar button {
+    background: rgba(13,13,40,0.6); border: 1px solid rgba(34,34,85,0.5);
+    border-radius: 3px; color: var(--text-dim); padding: 2px 10px;
+    font-family: inherit; font-size: 10px; cursor: pointer;
+  }
+  .dev-bar button.active { border-color: var(--border-hl); color: var(--border-hl); }
+
+  /* ============================================================
+     PAGE 0: MAIN MENU (unchanged)
+     ============================================================ */
+  .menu-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .menu-bg canvas { border-radius: 2px; opacity: 0.35; }
+  .menu-overlay {
+    position: absolute; inset: 0;
+    background: rgba(6,6,15,0.88);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .panel {
+    background: var(--bg-panel); border: 1px solid #1a1a4e; border-radius: 10px;
+    padding: 32px 40px; min-width: 380px; text-align: center;
+  }
+  .title { color: var(--text-bright); font-size: 28px; letter-spacing: 8px; margin-bottom: 2px; }
+  .subtitle { color: var(--text-dim); font-size: 9px; letter-spacing: 4px; margin-bottom: 20px; }
+  .section-hint {
+    color: var(--accent); font-size: 10px; border: 1px solid #1a1a3e; border-radius: 10px;
+    padding: 3px 16px; display: inline-block; margin-bottom: 18px;
+  }
+  .btn {
+    display: block; width: 100%;
+    background: var(--bg-btn); border: 1px solid var(--border-btn);
+    border-radius: 5px; color: var(--text-main);
+    padding: 10px 0; font-size: 14px; font-family: inherit;
+    cursor: pointer; margin-bottom: 6px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn:hover { border-color: var(--border-hl); color: var(--border-hl); }
+  .btn:active { background: #0a0a1e; }
+  .btn.primary { color: var(--border-hl); border-color: #225544; }
+  .btn.primary:hover { border-color: var(--border-hl); }
+  .btn.danger { border-color: #332233; color: var(--danger); }
+  .btn.danger:hover { border-color: var(--danger); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; color: var(--text-dim) !important; border-color: var(--border-btn) !important; }
+  .footer-row { display: flex; justify-content: center; gap: 16px; margin-top: 14px; }
+  .footer-row button {
+    background: transparent; border: none; color: var(--text-dim);
+    font-size: 11px; font-family: inherit; cursor: pointer; padding: 4px 12px;
+  }
+  .footer-row button:hover { color: var(--border-hl); }
+  .footer-row button.exit:hover { color: var(--danger); }
+  .decor-line { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,255,136,0.4), transparent); margin: 8px 0; }
+  .decor-snake { display: flex; justify-content: center; gap: 4px; margin: 4px 0; }
+  .decor-snake .seg { width: 8px; height: 8px; border-radius: 2px; }
+  .decor-snake .seg.head { background: var(--snake-head); }
+  .decor-snake .seg.body { background: var(--snake-body); }
+
+  /* ============================================================
+     PAGE 1: GAME PAGE (multiplayer layout)
+     ============================================================ */
+  .game-area {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+  }
+
+  /* ---- HUD (all fields visible) ---- */
+  .hud {
+    display: flex; align-items: center; justify-content: center;
+    gap: 20px; padding: 10px 20px;
+    background: rgba(6,6,15,0.92);
+    border-bottom: 1px solid rgba(0,255,136,0.12);
+    z-index: 2; position: relative;
+  }
+  .hud-item { text-align: center; }
+  .hud-label { color: var(--text-dim); font-size: 8px; letter-spacing: 2px; text-transform: uppercase; }
+  .hud-value { color: var(--text-bright); font-size: 20px; font-weight: bold; }
+  .hud-value.accent { color: var(--border-hl); }
+  .hud-value.danger { color: var(--danger); }
+  .hud-divider {
+    width: 1px; height: 28px;
+    background: linear-gradient(180deg, transparent, rgba(0,255,136,0.2), transparent);
+  }
+
+  /* ---- Body: board + sidebar ---- */
+  .game-body {
+    flex: 1; display: flex; position: relative;
+  }
+
+  /* ---- Board ---- */
+  .board-wrap {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .board-wrap canvas {
+    border: 3px solid var(--border-hl);
+    border-radius: 2px;
+    box-shadow: 0 0 20px rgba(0,255,136,0.15), inset 0 0 40px rgba(0,255,136,0.03);
+  }
+
+  /* ---- Leaderboard sidebar ---- */
+  .sidebar {
+    width: 170px;
+    background: rgba(10,10,26,0.85);
+    border-left: 1px solid rgba(0,255,136,0.10);
+    display: flex; flex-direction: column;
+    padding: 16px 12px;
+    z-index: 2;
+  }
+  .sidebar-title {
+    color: var(--text-dim); font-size: 9px; letter-spacing: 3px;
+    text-align: center; margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .lb-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; margin-bottom: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid transparent;
+  }
+  .lb-row.self {
+    border-color: rgba(0,255,136,0.15);
+    background: rgba(0,255,136,0.04);
+  }
+  .lb-rank {
+    width: 18px; font-size: 12px; font-weight: bold;
+    color: var(--text-dim); text-align: center;
+  }
+  .lb-rank.top1 { color: #ffd700; }
+  .lb-rank.top2 { color: #c0c0c0; }
+  .lb-rank.top3 { color: #cd7f32; }
+  .lb-dot {
+    width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0;
+  }
+  .lb-name {
+    flex: 1; font-size: 11px; color: var(--text-main);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-score {
+    font-size: 11px; color: var(--border-hl); font-weight: bold;
+  }
+  .lb-dead {
+    text-decoration: line-through; color: var(--danger) !important;
+    font-size: 10px;
+  }
+  .lb-dead .lb-score { color: var(--text-dim); }
+
+  /* ---- Board overlays ---- */
+  .board-overlay {
+    position: absolute; inset: 0;
+    background: rgba(6,6,15,0.92);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+  }
+  .board-overlay.hidden { display: none; }
+
+  /* ---- Game Over (multiplayer: ranking table) ---- */
+  .go-title { color: var(--danger); font-size: 18px; letter-spacing: 6px; margin-bottom: 6px; }
+  .go-subtitle { color: var(--text-dim); font-size: 12px; margin-bottom: 16px; }
+  .go-score { color: var(--border-hl); font-size: 36px; font-weight: bold; margin-bottom: 2px; }
+  .go-stats { color: var(--text-dim); font-size: 12px; margin-bottom: 18px; }
+
+  .result-table {
+    width: 100%; margin-bottom: 18px; border-collapse: collapse;
+  }
+  .result-table th {
+    color: var(--text-dim); font-size: 9px; letter-spacing: 2px;
+    padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    text-transform: uppercase;
+  }
+  .result-table td {
+    color: var(--text-main); font-size: 13px;
+    padding: 5px 8px; text-align: center;
+  }
+  .result-table tr.you td { color: var(--border-hl); }
+
+  /* ---- Countdown ---- */
+  .countdown-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 8; pointer-events: none;
+    background: rgba(6,6,15,0.55);
+  }
+  .countdown-overlay.hidden { display: none; }
+  .countdown-hint-wrap { position: absolute; bottom: 60px; font-size: 18px; }
+  .countdown-num { font-size: 72px; color: var(--border-hl); }
+
+  /* ---- Shine animation — constant speed, left→right ---- */
+  /* 反光从左向右扫过：背景从右偏移到左偏，亮带自左进入、自右离开 */
+  @keyframes shine {
+    0%   { background-position: 300% center; }
+    100% { background-position: -300% center; }
+  }
+  .text-shine {
+    background: linear-gradient(
+      90deg,
+      var(--text-dim) 0%,
+      var(--text-dim) 30%,
+      rgba(0,255,136,0.3) 42%,
+      var(--border-hl) 47%,
+      var(--accent) 50%,
+      var(--border-hl) 53%,
+      rgba(0,255,136,0.3) 58%,
+      var(--text-dim) 70%,
+      var(--text-dim) 100%
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+  }
+
+  /* ---- Settings ---- */
+  .settings-panel {
+    background: var(--bg-panel); border: 1px solid #1a1a4e; border-radius: 10px;
+    padding: 32px 44px; min-width: 440px; text-align: center; position: relative;
+  }
+  .settings-panel .title { font-size: 22px; letter-spacing: 6px; margin-bottom: 20px; }
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 20px; border-bottom: 1px solid #1a1a4e;
+  }
+  .tabs button {
+    flex: 1; background: transparent; border: none;
+    color: var(--text-dim); padding: 8px 0;
+    font-family: inherit; font-size: 13px; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+  }
+  .tabs button.active { color: var(--border-hl); border-bottom-color: var(--border-hl); }
+  .form-group { margin-bottom: 16px; text-align: left; }
+  .form-group label {
+    display: block; color: var(--text-dim); font-size: 10px;
+    letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase;
+  }
+  .form-group select {
+    width: 100%; background: #08081a; border: 1px solid #1a1a4e; border-radius: 4px;
+    color: var(--accent); padding: 8px 12px; font-family: inherit; font-size: 13px;
+  }
+  .form-group select:focus { outline: none; border-color: var(--border-hl); }
+  .form-group select option { background: #0a0a1a; color: var(--text-main); }
+  .slider-wrap { display: flex; align-items: center; gap: 10px; }
+  .slider-wrap input[type=range] { flex: 1; }
+  .slider-wrap .val { color: var(--border-hl); font-size: 13px; min-width: 32px; text-align: right; }
+  input[type=range] {
+    -webkit-appearance: none; height: 4px; background: #1a1a4e; border-radius: 2px; outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--border-hl); cursor: pointer;
+  }
+  .settings-back { margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- DEV BAR -->
+  <div class="dev-bar">
+    <button class="active" data-mode="menu"     onclick="switchTo('menu')">Menu</button>
+    <button data-mode="playing"  onclick="switchTo('playing')">Playing</button>
+    <button data-mode="pause"    onclick="switchTo('pause')">Pause</button>
+    <button data-mode="gameover" onclick="switchTo('gameover')">GameOver</button>
+    <button data-mode="settings" onclick="switchTo('settings')">Settings</button>
+    <button data-mode="countdown" onclick="switchTo('countdown')">3-2-1</button>
+  </div>
+
+  <!-- ============================================================
+       PAGE 0: MAIN MENU
+       ============================================================ -->
+  <div class="page active" id="page-menu">
+    <div class="menu-bg"><canvas id="bg-canvas" width="480" height="480"></canvas></div>
+    <div class="menu-overlay">
+      <div class="panel">
+        <div class="decor-line"></div>
+        <div class="decor-snake">
+          <div class="seg head"></div><div class="seg body"></div><div class="seg body"></div>
+          <div class="seg body"></div><div class="seg body"></div><div class="seg body"></div>
+        </div>
+        <div class="decor-line"></div>
+        <div class="title">SNAKE ARENA</div>
+        <div class="subtitle">MULTI-MODE BATTLE PLATFORM</div>
+        <div class="section-hint">▼ SELECT MODE</div>
+        <button class="btn primary" onclick="switchTo('countdown')">单人经典模式</button>
+        <button class="btn" disabled>AI 对战模式</button>
+        <button class="btn" disabled>联机对战模式</button>
+        <button class="btn" disabled>对局回放</button>
+        <div class="footer-row">
+          <button onclick="switchTo('settings')">[ 设置 ]</button>
+          <button class="exit">[ 退出 ]</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE 1: GAME PAGE (multiplayer mode shown)
+       ============================================================ -->
+  <div class="page" id="page-game">
+    <div class="game-area">
+      <!-- HUD: all fields visible -->
+      <div class="hud">
+        <div class="hud-item">
+          <div class="hud-label">Score</div>
+          <div class="hud-value accent" id="hud-score">156</div>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-item">
+          <div class="hud-label">Length</div>
+          <div class="hud-value" id="hud-length">12</div>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-item">
+          <div class="hud-label">Time</div>
+          <div class="hud-value" id="hud-time">01:42</div>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-item">
+          <div class="hud-label">Speed</div>
+          <div class="hud-value" id="hud-speed" style="font-size:14px;">MID</div>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-item">
+          <div class="hud-label">Kills</div>
+          <div class="hud-value danger" id="hud-kills">2</div>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-item">
+          <div class="hud-label">Rank</div>
+          <div class="hud-value accent" id="hud-rank" style="font-size:14px;">1 / 4</div>
+        </div>
+      </div>
+
+      <!-- Board + Sidebar -->
+      <div class="game-body">
+        <!-- Board -->
+        <div class="board-wrap">
+          <canvas id="game-canvas" width="420" height="420"></canvas>
+
+          <!-- Pause -->
+          <div class="board-overlay hidden" id="pause-overlay">
+            <div class="panel">
+              <div class="title" style="font-size:22px;letter-spacing:4px;">游戏暂停</div>
+              <div style="height:20px"></div>
+              <button class="btn primary">继续游戏</button>
+              <button class="btn">重新开始</button>
+              <button class="btn">设置</button>
+              <div style="height:8px"></div>
+              <button class="btn danger">返回主菜单</button>
+            </div>
+          </div>
+
+          <!-- GameOver (multiplayer: final ranking) -->
+          <div class="board-overlay hidden" id="go-overlay">
+            <div class="panel" style="min-width:420px;">
+              <div class="go-title">游 戏 结 束</div>
+              <div class="go-subtitle">— 最终排名 —</div>
+
+              <table class="result-table">
+                <thead><tr><th>#</th><th>玩家</th><th>分数</th><th>长度</th><th>击杀</th><th>状态</th></tr></thead>
+                <tbody>
+                  <tr class="you">
+                    <td style="color:#ffd700;font-weight:bold;">1</td><td>YOU</td><td>156</td><td>12</td><td>2</td><td style="color:#00ff88;">存活</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#c0c0c0;font-weight:bold;">2</td><td>Player_2</td><td>89</td><td>7</td><td>1</td><td style="color:#ff6688;">死亡</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#cd7f32;font-weight:bold;">3</td><td>SnakeKing</td><td>54</td><td>5</td><td>0</td><td style="color:#ff6688;">死亡</td>
+                  </tr>
+                  <tr>
+                    <td style="color:#556;">4</td><td>NoobSlayer</td><td>12</td><td>3</td><td>0</td><td style="color:#ff6688;">死亡</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <button class="btn primary">再来一局</button>
+              <button class="btn" disabled>保存回放</button>
+              <div style="height:8px"></div>
+              <button class="btn danger">返回主菜单</button>
+            </div>
+          </div>
+
+          <!-- Countdown -->
+          <div class="countdown-overlay hidden" id="countdown-overlay">
+            <div class="countdown-hint-wrap" id="cd-hint-wrap">
+              <span class="text-shine">按 任 意 键 开 始</span>
+            </div>
+            <div class="countdown-num" id="cd-num" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Leaderboard sidebar -->
+        <div class="sidebar" id="sidebar">
+          <div class="sidebar-title">— Rank —</div>
+
+          <div class="lb-row self">
+            <div class="lb-rank top1">1</div>
+            <div class="lb-dot" style="background:#00ff88;"></div>
+            <div class="lb-name">YOU</div>
+            <div class="lb-score">156</div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank top2">2</div>
+            <div class="lb-dot" style="background:#4488ff;"></div>
+            <div class="lb-name">Player_2</div>
+            <div class="lb-score">89</div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank top3">3</div>
+            <div class="lb-dot" style="background:#ff8844;"></div>
+            <div class="lb-name">SnakeKing</div>
+            <div class="lb-score">54</div>
+          </div>
+          <div class="lb-row lb-dead">
+            <div class="lb-rank">4</div>
+            <div class="lb-dot" style="background:#8844ff;opacity:0.5;"></div>
+            <div class="lb-name">NoobSlayer</div>
+            <div class="lb-score">12</div>
+          </div>
+
+          <div style="flex:1;"></div>
+          <div style="font-size:9px;color:var(--text-dim);text-align:center;">
+            Alive: 3 / 4
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SETTINGS (stage-level)
+       ============================================================ -->
+  <div class="stage-overlay hidden" id="settings-overlay">
+    <div class="settings-panel">
+      <div class="title">设 置</div>
+      <div class="tabs">
+        <button class="active" onclick="switchTab(this,'tab-control')">操作</button>
+        <button onclick="switchTab(this,'tab-game')">游戏</button>
+      </div>
+      <div id="tab-control">
+        <div class="form-group"><label>移动键位</label><select><option>方向键 (↑ ↓ ← →)</option><option>WASD</option></select></div>
+        <div class="form-group"><label>语言 / Language</label><select><option>中文</option><option>English</option></select></div>
+      </div>
+      <div id="tab-game" style="display:none;">
+        <div class="form-group"><label>游戏速度</label><select><option>慢 (150ms)</option><option selected>中 (100ms)</option><option>快 (60ms)</option></select></div>
+        <div class="form-group"><label>棋盘大小</label><select><option>小 (15×15)</option><option selected>中 (20×20)</option><option>大 (30×30)</option></select></div>
+        <div class="form-group">
+          <label>音量</label>
+          <div class="slider-wrap">
+            <input type="range" min="0" max="100" value="50" oninput="this.nextElementSibling.textContent=this.value">
+            <span class="val">50</span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-back"><button class="btn" onclick="closeSettings()">返回</button></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const COLS = 20, ROWS = 20, CELL = 21; // 21px per cell for multiplayer board
+
+  function drawBoard(canvasId, alpha, snakes, foodPos) {
+    const c = document.getElementById(canvasId);
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 0.5;
+    for (let r=0; r<=ROWS; r++) { ctx.beginPath(); ctx.moveTo(0, r*CELL); ctx.lineTo(COLS*CELL, r*CELL); ctx.stroke(); }
+    for (let col=0; col<=COLS; col++) { ctx.beginPath(); ctx.moveTo(col*CELL, 0); ctx.lineTo(col*CELL, ROWS*CELL); ctx.stroke(); }
+
+    // Food
+    if (foodPos) {
+      const fx = foodPos.x * CELL + CELL/2, fy = foodPos.y * CELL + CELL/2;
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.shadowColor = '#ff4466'; ctx.shadowBlur = 12;
+      ctx.fillStyle = '#ff4466';
+      ctx.beginPath(); ctx.arc(fx, fy, 5, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    // Snakes
+    const colors = [
+      { head:'#00ff88', body:'#00bb55', glow:'#00ff88' },
+      { head:'#4488ff', body:'#3366cc', glow:'#4488ff' },
+      { head:'#ff8844', body:'#cc6633', glow:'#ff8844' },
+      { head:'#8844ff', body:'#6633cc', glow:'#8844ff' },
+    ];
+
+    ctx.save(); ctx.globalAlpha = alpha;
+    for (let si = 0; si < snakes.length; si++) {
+      const body = snakes[si];
+      const col = colors[si];
+      for (let i = body.length-1; i >= 0; i--) {
+        const seg = body[i];
+        const t = i / Math.max(body.length-1, 1);
+        // Interpolate body→head color per segment
+        const r = Math.round(parseInt(col.body.slice(1,3),16) + t*(parseInt(col.head.slice(1,3),16)-parseInt(col.body.slice(1,3),16)));
+        const g = Math.round(parseInt(col.body.slice(3,5),16) + t*(parseInt(col.head.slice(3,5),16)-parseInt(col.body.slice(3,5),16)));
+        const b = Math.round(parseInt(col.body.slice(5,7),16) + t*(parseInt(col.head.slice(5,7),16)-parseInt(col.body.slice(5,7),16)));
+        const color = `rgb(${r},${g},${b})`;
+
+        const sx = seg.x * CELL + 3, sy = seg.y * CELL + 3;
+        const bs = 15, radius = 3;
+
+        ctx.shadowColor = i === 0 ? col.glow : 'transparent';
+        ctx.shadowBlur = i === 0 ? 8 : 0;
+        ctx.fillStyle = color;
+        ctx.strokeStyle = i === 0 ? col.head : col.body; ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(sx+radius, sy); ctx.lineTo(sx+bs-radius, sy);
+        ctx.quadraticCurveTo(sx+bs, sy, sx+bs, sy+radius);
+        ctx.lineTo(sx+bs, sy+bs-radius);
+        ctx.quadraticCurveTo(sx+bs, sy+bs, sx+bs-radius, sy+bs);
+        ctx.lineTo(sx+radius, sy+bs);
+        ctx.quadraticCurveTo(sx, sy+bs, sx, sy+bs-radius);
+        ctx.lineTo(sx, sy+radius);
+        ctx.quadraticCurveTo(sx, sy, sx+radius, sy);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  // ==============================================================
+  // Mode switching
+  // ==============================================================
+  let cdState = 0;
+
+  function switchTo(mode) {
+    const menuPage = document.getElementById('page-menu');
+    const gamePage = document.getElementById('page-game');
+    const pauseOv   = document.getElementById('pause-overlay');
+    const goOv      = document.getElementById('go-overlay');
+    const cdOv      = document.getElementById('countdown-overlay');
+    const settingsOv= document.getElementById('settings-overlay');
+
+    const needsGamePage = ['playing','pause','gameover','countdown'].includes(mode);
+
+    if (needsGamePage) {
+      gamePage.classList.add('active');
+      menuPage.classList.remove('active');
+    } else {
+      menuPage.classList.add('active');
+      gamePage.classList.remove('active');
+      // Menu background: single snake
+      drawBoard('bg-canvas', 0.35, [
+        [{x:10,y:10},{x:9,y:10},{x:8,y:10},{x:7,y:10},{x:6,y:10},{x:5,y:10}]
+      ], {x:14,y:8});
+    }
+
+    [pauseOv, goOv, cdOv].forEach(o => o.classList.add('hidden'));
+    if (mode !== 'settings') settingsOv.classList.add('hidden');
+
+    if (mode === 'pause')    pauseOv.classList.remove('hidden');
+    if (mode === 'gameover') goOv.classList.remove('hidden');
+
+    if (mode === 'countdown') {
+      cdOv.classList.remove('hidden');
+      document.getElementById('cd-hint-wrap').style.display = 'block';
+      document.getElementById('cd-num').style.display = 'none';
+      cdState = 0;
+    }
+
+    if (mode === 'settings') {
+      settingsOv.classList.remove('hidden');
+    }
+
+    if (mode === 'playing' || mode === 'pause') {
+      // Multiplayer: 4 snakes
+      drawBoard('game-canvas', 1.0, [
+        [{x:10,y:10},{x:9,y:10},{x:8,y:10},{x:7,y:10},{x:6,y:10},{x:5,y:10}],
+        [{x:14,y:6},{x:14,y:7},{x:14,y:8},{x:14,y:9},{x:14,y:10}],
+        [{x:3,y:14},{x:4,y:14},{x:5,y:14},{x:6,y:14}],
+        [{x:16,y:16},{x:16,y:17}],
+      ], {x:12,y:12});
+    }
+
+    document.querySelectorAll('.dev-bar button').forEach(b =>
+      b.classList.toggle('active', b.dataset.mode === mode)
+    );
+  }
+
+  function closeSettings() {
+    document.getElementById('settings-overlay').classList.add('hidden');
+  }
+
+  function switchTab(btn, tabId) {
+    btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-control').style.display = tabId === 'tab-control' ? 'block' : 'none';
+    document.getElementById('tab-game').style.display = tabId === 'tab-game' ? 'block' : 'none';
+  }
+
+  // Countdown
+  document.getElementById('countdown-overlay').addEventListener('click', () => {
+    cdState++;
+    const hintWrap = document.getElementById('cd-hint-wrap');
+    const num = document.getElementById('cd-num');
+    if (cdState === 1) {
+      hintWrap.style.display = 'none'; num.style.display = 'block'; num.textContent = '3';
+    } else if (cdState <= 3) {
+      num.textContent = String(4 - cdState);
+    } else if (cdState === 4) {
+      num.textContent = 'GO!'; num.style.color = '#ff6688';
+    } else {
+      num.style.color = '#00ff88'; switchTo('playing'); cdState = 0;
+    }
+  });
+
+  // Init
+  drawBoard('bg-canvas', 0.35, [
+    [{x:10,y:10},{x:9,y:10},{x:8,y:10},{x:7,y:10},{x:6,y:10},{x:5,y:10}]
+  ], {x:14,y:8});
+</script>
+</body>
+</html>

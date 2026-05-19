@@ -13,6 +13,8 @@ struct Board {
     std::unordered_set<Point> freeCells;  ///< 当前空闲的格子
     Point foodPos;                        ///< 食物位置
     int foodPoints = 1;                   ///< 当前食物分值
+    std::unordered_set<Point> obstacles;  ///< 预留：地图障碍物格
+    bool foodEaten = false;               ///< 本 tick 食物是否被吃
 };
 
 #endif // SNAKE_CORE_BOARD_H

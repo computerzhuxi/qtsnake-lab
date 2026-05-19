@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 project(SnakeArena VERSION 1.0.0 LANGUAGES CXX)
 
+if(MSVC)
+  add_compile_options(/W4)
+else()
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
@@ -19,6 +25,13 @@ FetchContent_Declare(
   GIT_TAG v1.14.0
 )
 FetchContent_MakeAvailable(googletest)
+if(MSVC)
+  target_compile_options(gtest PRIVATE /W0)
+  target_compile_options(gtest_main PRIVATE /W0)
+else()
+  target_compile_options(gtest PRIVATE -w)
+  target_compile_options(gtest_main PRIVATE -w)
+endif()
 
 enable_testing()
 add_subdirectory(src/core)
@@ -36,3 +49,6 @@ add_executable(SnakeArena
     ${RESOURCE_FILE}
 )
 target_link_libraries(SnakeArena PRIVATE snake_app snake_controller snake_ui snake_audio snake_logging Qt5::Widgets)
+
+add_executable(SnakeServer src/main_server.cpp)
+target_link_libraries(SnakeServer PRIVATE snake_core snake_logging Qt5::Core)

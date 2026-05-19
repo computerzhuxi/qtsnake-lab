@@ -1,3 +1,5 @@
+# 本文件为 Snake Arena 项目的设计单一来源（Single Source of Truth）。历史 docs/plan.md 已归档至 docs/archive/plan-v1.md。
+
 # Snake Arena 重设计文档
 
 ## 1. 项目最终形态

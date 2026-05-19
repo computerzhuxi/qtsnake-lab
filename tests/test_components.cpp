@@ -166,7 +166,7 @@ TEST(FoodComponent, eatingFoodGrowsSnakeAndSpawnsNew) {
     s.board.foodPos = Point{6, 5};
     s.board.freeCells.erase(Point{6, 5});
 
-    int oldLen = s.snakes[0].body().size();
+    int oldLen = static_cast<int>(s.snakes[0].body().size());
     int oldScore = s.score;
 
     move.update(s);

@@ -74,7 +74,12 @@ std::string Logger::levelStr(LogLevel level) {
 
 std::string Logger::timestamp() {
     auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
+    std::tm tm;
+#ifdef _MSC_VER
+    localtime_s(&tm, &t);
+#else
+    tm = *std::localtime(&t);
+#endif
     std::ostringstream oss;
     oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
     return oss.str();

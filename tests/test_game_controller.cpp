@@ -226,9 +226,9 @@ TEST(GameController, stateChangedSignalEmits) {
     QObject::connect(&c, &GameController::stateChanged,
                      [&states](GameController::State s) { states.append(s); });
 
-    c.startGame(30, 30, 200);
+    c.startGame(50, 50, 1000);
     c.handleReadyKey();
-    pumpFor(2500);
+    pumpFor(2200);
     c.pause();
     c.resume();
 

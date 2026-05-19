@@ -41,7 +41,7 @@ void GameScene::syncFromState(const GameState& state) {
             removeItem(item);
             delete item;
         }
-        for (size_t j = 0; j < body.size(); ++j) {
+        for (int j = 0; j < static_cast<int>(body.size()); ++j) {
             items[j]->setPos(cellToPixel(body[j].x), cellToPixel(body[j].y));
             items[j]->setIsHead(j == 0);
         }

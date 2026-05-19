@@ -1,6 +1,6 @@
-# Snake Arena 项目总体规划 (plan.md)
+# 本文件为 docs/plan.md 的归档版本（v1）；最新设计请见 docs/design.md 与 docs/plans/。
 
-## 1. 项目最终形态
+# Snake Arena 项目总体规划 (plan.md)## 1. 项目最终形态
 
 基于 Qt5 的多模式贪吃蛇对战平台，四种模式：
 

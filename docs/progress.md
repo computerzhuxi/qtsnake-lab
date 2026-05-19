@@ -37,7 +37,7 @@
 | T-0c | 热修复：清空 src/app/ 全部 setStyleSheet | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet = 0 |
 | T-07 | QSS 集中化（清除内联样式） | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | GamePage setStyleSheet 清零；三态走 property+QSS；MainMenuWidget/GameOverWidget 遗留 |
 | T-08 | 视图自适应（resize fitInView） | `passed` | dev-agent | 2026-05-18 | 2026-05-18 | resizeEvent 追加 fitInView+KeepAspectRatio；仅 4 行 |
-| T-09 | 新增测试套件 `test_game_controller.cpp` | `pending` | — | — | — | 前置 T-01 / T-02 / T-03 |
+| T-09 | 新增测试套件 `test_game_controller.cpp` | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 14 用例覆盖状态机/重置/GameOver/确定性/信号契约；lambda+QVector 替代 QSignalSpy 零外链；42/42 全绿 |
 | T-10 | 工程门面：README + SnakeServer 占位 + 编译警告 | `pending` | — | — | — | 收尾 |
 
 ---
@@ -48,6 +48,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-19 | T-09 | **通过（passed）** | 14 用例覆盖状态机全路径/重置/GameOver/确定性/信号契约；lambda+QVector 替代 QSignalSpy 零外链；CMakeLists.txt 无变更；42/42 全绿（21.6s） |
 | 2026-05-18 | T-08 | **通过（passed）** | resizeEvent 末尾追加 fitInView + KeepAspectRatio；m_scene / isEmpty 双重守卫；仅 4 行；31 测试全绿 |
 | 2026-05-18 | T-0c | **通过（passed）** | MainMenuWidget 8 处 + GameOverWidget 1 处迁移至 main.qss；src/app/ setStyleSheet 命中数 = 0；AGENTS.md §5.3 全面达标 |
 | 2026-05-18 | T-07 | **通过（passed）** | GamePage setStyleSheet 清零；三态走 setProperty + QSS 属性选择器；31 测试全绿；MainMenuWidget/GameOverWidget 遗留进入跟踪 |
@@ -75,11 +76,11 @@
 |---|---|---|---|---|
 | 2026-05-18 | 严格警告升级可能暴露既有警告 | 编译输出爆炸 | T-10 一并修复，必要时抑制 googletest 警告 | 监控中 |
 | 2026-05-18 | `RngService` 牵动多模块 | 编译错误连锁 | T-03 范围已锁定，FoodComponent 旧 `setSeed` 接口同步删除 | 监控中 |
-| 2026-05-18 | TEST-1：`test_game_controller.cpp` 用全局静态 `QApplication`，依赖链接器把它在 `gtest_main` 的 main() 之前调起 | 在某些工具链上脆弱 | T-09 强化：迁移到 `::testing::Environment` 子类或自定义 main | 监控中 |
-| 2026-05-18 | TEST-2：`repeatedHandleReadyKeyDoesNotStack` 仅靠 Ready-state 早退路径间接验证防叠加，未真测 disconnect | 未来若放开 handleReadyKey 在 Countdown 下重启，此用例无法捕获叠加 | T-09 补强：构造能强制重连的路径并断言 disconnect 起效 | 监控中 |
-| 2026-05-18 | TEST-3：`tests/CMakeLists.txt` 未将 `test_board.cpp` 加入 `test_core` 源列表，Board 模块 4 个用例**根本未在 CI 跑** | Board 数据层回归无保护 | T-09 顺手追加，归入"补齐测试覆盖"语义 | 监控中 |
+| 2026-05-18 | TEST-1：QApplication 全局静态生命周期脆弱 | 在某些工具链上脆弱 | ✅ T-09 已修复：迁移至 testing::Environment |
+| 2026-05-18 | TEST-2：anti-stack 测试仅靠 Ready-state 早退间接验证 | 未来放开 handleReadyKey 在 Countdown 下重启则漏检 | ✅ T-09 已修复：reset+重激活路径 + 收紧断言 |
+| 2026-05-18 | TEST-3：test_board.cpp 未加入 CMakeLists 源列表，4 个 Board 用例未在 CI 跑 | Board 数据层回归无保护 | ⚠️ 升格为 AP-5，T-10 或独立 Hotfix |
 | 2026-05-18 | TC-DEFECT-1：T-03 Task Card "输入约束" 漏列 `tests/test_game_controller.cpp`，但"验收标准"要求新增测试 | Task Card 字面不闭合 | 我（主程）补一行授权（见下方"遗留问题"中 TC-DEFECT-1 条） | 已修复 |
-| 2026-05-18 | MINOR-1：T-03 确定性测试只比对首颗食物 + head + body（substantively 等价"前 10 颗食物"） | 测试强度略弱 | T-09 可加 "10 颗食物循环模拟" 用例（需要事件循环），择机 | 监控中 |
+| 2026-05-18 | MINOR-1：T-03 确定性测试只比对首颗食物 + head + body | 测试强度略弱 | 降级 Known Issue；T-09 sameSeedSameFoodSequence 已覆盖 Playing 后比较 |
 
 ---
 
@@ -90,5 +91,6 @@
 | AP-3 | `PauseWidget → GamePage → AppShell` 三层信号原样转发，可裁剪 | Phase-6 或专项重构 |
 | SN-2 | `Snake` 构造反向延伸 2 格无边界保护 | T-06 头注释中补充契约说明（如已包含则关闭） |
 | CM-3 | CMakeLists 缺 `CMAKE_AUTORCC ON`，导致 QSS 资源未编入 exe，运行时 `Failed to load QSS stylesheet`；当前游戏使用 Qt 默认浅色样式（与设计文档暗色 TRON 风不符）。**阻塞 T-07**。 | ✅ **T-0a 已修复（2026-05-18）** |
+| AP-5 | `test_board.cpp` 未加入 CMakeLists 源列表，4 个 Board 用例未在 CI 跑 | T-10 或 Hotfix |
 | AP-4 | `MainMenuWidget.cpp` (8 处) + `GameOverWidget.cpp` (1 处) 仍使用内联 `setStyleSheet`，未纳入 T-07 输入约束。T-07 仅清除 GamePage。 | ✅ **T-0c 已修复（2026-05-18）** |
 | BUG-1 | `AppShell::keyPressEvent` ESC 分支存在直通穿透：Playing→Paused 后未 `return`，紧接的 `if (state == Paused)` 立即把 ESC 解释为 resume，状态在一次按键内回到 Playing。玩家**无法暂停**游戏。Pre-existing，与 T-01 无关。 | ✅ **T-0b 已修复（2026-05-18）** |

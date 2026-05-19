@@ -50,7 +50,7 @@
 |---|---|---|---|---|---|---|
 | T-11 | 碰撞数据结构 + 接口定义 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 文件（2 新增头 + Board 改），46 测试全绿，countdownToPlaying flaky 非本卡引入 |
 | T-12 | NaiveCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 6 文件变更，8 用例，54/54 全绿，算法与伪代码逐行一致 |
-| T-13 | GridCollisionDetector + 测试 | `pending` | — | — | — | 依赖 T-11 |
+| T-13 | GridCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 4 文件变更，9 用例含 cross-validation，63/63 全绿 |
 | T-14 | CollisionResolver + 测试 | `pending` | — | — | — | 依赖 T-11 |
 | T-15 | MoveComponent 吸收 freeCells + FoodSpawner | `pending` | — | — | — | 依赖 T-11 |
 | T-16 | Controller 流水线重构 + 删旧组件 | `pending` | — | — | — | 依赖 T-12~T-15 |
@@ -69,6 +69,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-19 | T-13 | **通过（passed）** | Grid + epoch 算法正确；9 用例含 cross-validation 100 随机状态一致；63/63 全绿 |
 | 2026-05-19 | T-12 | **通过（passed）** | NaiveCollisionDetector 算法与伪代码逐行一致；8 用例覆盖全部 7 种 CollisionType；54/54 全绿 /W4 零警告 |
 | 2026-05-19 | T-11 | **通过（passed）** | CollisionReport.h / ICollisionDetector.h / Board.h 全部达标；46/46 全绿 |
 | 2026-05-19 | T-09 | **通过（passed）** | 14 用例覆盖状态机全路径/重置/GameOver/确定性/信号契约；lambda+QVector 替代 QSignalSpy 零外链；CMakeLists.txt 无变更；42/42 全绿（21.6s） |

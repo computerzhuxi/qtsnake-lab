@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <memory>
 #include "GameState.h"
+#include "CollisionReport.h"
 
 class GameScene;
 class InputComponent;
@@ -65,8 +66,11 @@ private slots:
     void update();
 
 private:
-    /// \brief 初始化需要首次调用的组件（MoveComponent + FoodComponent）
+    /// \brief 初始化需要首次调用的组件（FoodComponent）
     void initComponents();
+
+    /// \brief 处理碰撞报告：先判死、后判吃，最终设 gameOver
+    void processCollisions(const std::vector<CollisionReport>& reports);
 
     QTimer* m_timer;                                ///< 主循环定时器
     QTimer* m_countdownTimer = nullptr;             ///< 倒计时定时器（3-2-1）

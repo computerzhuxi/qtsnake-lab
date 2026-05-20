@@ -1,7 +1,17 @@
 #include "CollisionComponent.h"
+#include "GameState.h"
 
-void CollisionComponent::update(GameState& state) {
-    auto& board = state.board;
+/// \brief 返回 mask 中最低置位的 index（0-7），mask 非零时调用
+static int firstSetBit(uint8_t mask) {
+    for (int i = 0; i < 8; ++i)
+        if (mask & (1 << i))
+            return i;
+    return -1;
+}
+
+std::vector<CollisionReport> CollisionComponent::detect(const GameState& state) const {
+    std::vector<CollisionReport> reports;
+    const auto& board = state.board;
 
     for (size_t i = 0; i < state.snakes.size(); ++i) {
         Point head = state.snakes[i].head();
@@ -9,8 +19,8 @@ void CollisionComponent::update(GameState& state) {
 
         // 1. Wall
         if (board.isOutOfBounds(head)) {
-            state.gameOver = true;
-            return;
+            reports.push_back({si, CollisionType::Wall, head});
+            continue;
         }
 
         const auto& cell = board.cellAt(head);
@@ -18,23 +28,21 @@ void CollisionComponent::update(GameState& state) {
         uint8_t others     = static_cast<uint8_t>(cell.snakeMask & ~selfBit);
         uint8_t otherHeads = static_cast<uint8_t>(cell.headMask  & ~selfBit);
 
-        // 2. HeadToHead
+        // 2. HeadToHead / Body
         if (otherHeads) {
-            state.gameOver = true;
-            return;
-        }
-        // 3. SelfBody / OtherBody
-        if (others) {
-            state.gameOver = true;
-            return;
+            reports.push_back({si, CollisionType::HeadToHead, head, firstSetBit(otherHeads)});
+        } else if (others) {
+            reports.push_back({si, CollisionType::OtherBody, head, firstSetBit(others)});
         }
 
-        // 4. Food — 交由 FoodComponent 处理
-
-        // 5. Obstacle
+        // 3. Food / Obstacle
+        if (cell.hasFood) {
+            reports.push_back({si, CollisionType::Food, head});
+        }
         if (cell.hasObstacle) {
-            state.gameOver = true;
-            return;
+            reports.push_back({si, CollisionType::Obstacle, head});
         }
     }
+
+    return reports;
 }

@@ -1,16 +1,17 @@
 #ifndef SNAKE_CONTROLLER_COLLISIONCOMPONENT_H
 #define SNAKE_CONTROLLER_COLLISIONCOMPONENT_H
 
-#include "GameState.h"
+#include <vector>
+#include "CollisionReport.h"
 
-/// \brief 碰撞检测组件
-/// \details 通过空闲集统一判断碰撞：
-///          - head 在 freeCells 中 → 安全
-///          - head == foodPos → 安全（吃食物，由 FoodComponent 处理）
-///          - 其他 → gameOver（撞墙/撞自己/撞别的蛇）
+struct GameState;
+
+/// \brief 碰撞检测组件（纯检测，不修改状态）
+/// \details 读 Board::grid 位掩码，返回 CollisionReport 列表。
+///          不修改 GameState，不产生副作用。
 class CollisionComponent {
 public:
-    void update(GameState& state);
+    std::vector<CollisionReport> detect(const GameState& state) const;
 };
 
 #endif

@@ -72,8 +72,8 @@ TEST(CollisionComponent, headInFreeCellsIsSafe) {
     MoveComponent move;
     move.update(s);
     CollisionComponent coll;
-    coll.update(s);
-    EXPECT_FALSE(s.gameOver);
+    auto reports = coll.detect(s);
+    EXPECT_TRUE(reports.empty());
 }
 
 TEST(CollisionComponent, headOnFoodIsSafe) {
@@ -87,8 +87,10 @@ TEST(CollisionComponent, headOnFoodIsSafe) {
     MoveComponent move;
     move.update(s);
     CollisionComponent coll;
-    coll.update(s);
-    EXPECT_FALSE(s.gameOver);
+    auto reports = coll.detect(s);
+    ASSERT_EQ(reports.size(), 1u);
+    EXPECT_EQ(reports[0].type, CollisionType::Food);
+    EXPECT_EQ(reports[0].snakeIndex, 0);
 }
 
 TEST(CollisionComponent, headOutsideBoardIsDead) {
@@ -103,8 +105,9 @@ TEST(CollisionComponent, headOutsideBoardIsDead) {
     MoveComponent move;
     move.update(s);
     CollisionComponent coll;
-    coll.update(s);
-    EXPECT_TRUE(s.gameOver);
+    auto reports = coll.detect(s);
+    ASSERT_EQ(reports.size(), 1u);
+    EXPECT_EQ(reports[0].type, CollisionType::Wall);
 }
 
 TEST(CollisionComponent, headOnSnakeBodyIsDead) {
@@ -120,8 +123,10 @@ TEST(CollisionComponent, headOnSnakeBodyIsDead) {
     MoveComponent move;
     move.update(s);  // head → (6,5)
     CollisionComponent coll;
-    coll.update(s);  // others != 0 → 死亡
-    EXPECT_TRUE(s.gameOver);
+    auto reports = coll.detect(s);
+    ASSERT_EQ(reports.size(), 1u);
+    EXPECT_EQ(reports[0].type, CollisionType::OtherBody);
+    EXPECT_EQ(reports[0].snakeIndex, 0);
 }
 
 // ========== FoodComponent ==========

@@ -133,7 +133,10 @@ void GameController::update() {
     m_render->update(m_state);
     m_input->update(m_state);
     m_move->update(m_state);
-    m_collision->update(m_state);
+
+    auto reports = m_collision->detect(m_state);
+    processCollisions(reports);
+
     m_food->update(m_state);
 
     if (m_state.gameOver) {
@@ -143,4 +146,41 @@ void GameController::update() {
         emit scoreChanged(m_state.score);
         LOG_INFO("GameController", "State: Playing -> GameOver, score=" + std::to_string(m_state.score));
     }
+}
+
+void GameController::processCollisions(const std::vector<CollisionReport>& reports) {
+    std::vector<bool> alive(m_state.snakes.size(), true);
+    bool anyoneAte = false;
+
+    for (auto& r : reports) {
+        auto& snake = m_state.snakes[r.snakeIndex];
+
+        switch (r.type) {
+        case CollisionType::Wall:
+        case CollisionType::SelfBody:
+        case CollisionType::OtherBody:
+        case CollisionType::Obstacle:
+            alive[r.snakeIndex] = false;
+            break;
+        case CollisionType::HeadToHead:
+            alive[r.snakeIndex] = false;
+            if (r.otherSnakeIndex >= 0)
+                alive[r.otherSnakeIndex] = false;
+            break;
+        case CollisionType::Food:
+            if (alive[r.snakeIndex]) {
+                snake.grow();
+                anyoneAte = true;
+            }
+            break;
+        }
+    }
+
+    bool allDead = true;
+    for (bool a : alive)
+        if (a) { allDead = false; break; }
+    if (allDead) m_state.gameOver = true;
+
+    if (anyoneAte)
+        m_state.board.markFoodEaten();
 }

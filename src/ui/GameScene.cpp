@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include <QPainter>
 #include <QPen>
 #include <QBrush>
 
@@ -90,4 +91,18 @@ void GameScene::clearAll() {
 
 int GameScene::cellToPixel(int cell) const {
     return cell * SnakeItem::cellSize + SnakeItem::cellSize / 2;
+}
+
+void GameScene::drawForeground(QPainter* painter, const QRectF& rect) {
+    QGraphicsScene::drawForeground(painter, rect);
+
+    int cs = SnakeItem::cellSize;
+    int w = m_boardW * cs;
+    int h = m_boardH * cs;
+
+    painter->setPen(QPen(QColor(255, 255, 255, 15), 1.0));
+    for (int x = 0; x <= m_boardW; ++x)
+        painter->drawLine(x * cs, 0, x * cs, h);
+    for (int y = 0; y <= m_boardH; ++y)
+        painter->drawLine(0, y * cs, w, y * cs);
 }

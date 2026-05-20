@@ -56,7 +56,7 @@
 | T-16 | FoodSpawner + 删旧文件 + Controller 流水线收尾 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 6 旧文件删除，46/46 全绿 |
 | T-16a | Food class + Board 删食物 + 文件整理 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | Food class 集中食物状态，Board 回归空间索引，controller 打平，45/45 全绿 |
 | T-17 | SnakeItem 渐变色 + 发光 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | setColor + 渐变插值 + 4 层霓虹发光，45/45 全绿 |
-| T-18 | FoodItem 光晕 + GameScene 网格线 | `pending` | — | — | — | — |
+| T-18 | FoodItem 光晕 + GameScene 网格线 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 层红色光晕 + drawForeground 网格线，45/45 全绿 |
 | T-19 | InfoBar + LeaderboardWidget | `pending` | — | — | — | — |
 | T-20 | GameOverWidget 多人排名表 | `pending` | — | — | — | — |
 | T-21 | ShineLabel 反光文字 | `pending` | — | — | — | — |

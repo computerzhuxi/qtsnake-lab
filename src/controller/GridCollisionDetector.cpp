@@ -23,14 +23,14 @@ std::vector<CollisionReport> GridCollisionDetector::detect(const GameState& stat
     const auto& board = state.board;
 
     m_epoch++;
-    ensureSize(board.width, board.height);
+    ensureSize(board.width(), board.height());
 
     // === Phase 1: Build occupancy grid ===
     for (size_t i = 0; i < snakes.size(); ++i) {
         const auto& body = snakes[i].body();
         for (size_t k = 0; k < body.size(); ++k) {
             Point p = body[k];
-            if (p.x < 0 || p.x >= board.width || p.y < 0 || p.y >= board.height)
+            if (p.x < 0 || p.x >= board.width() || p.y < 0 || p.y >= board.height())
                 continue;
             if (m_epochGrid[p.y][p.x] != m_epoch) {
                 m_grid[p.y][p.x] = CellInfo{};
@@ -56,8 +56,8 @@ std::vector<CollisionReport> GridCollisionDetector::detect(const GameState& stat
         Point head = snakes[i].head();
 
         // 1. Wall
-        if (head.x < 0 || head.x >= board.width ||
-            head.y < 0 || head.y >= board.height) {
+        if (head.x < 0 || head.x >= board.width() ||
+            head.y < 0 || head.y >= board.height()) {
             reports.push_back({static_cast<int>(i), CollisionType::Wall, head});
             continue;
         }
@@ -84,12 +84,12 @@ std::vector<CollisionReport> GridCollisionDetector::detect(const GameState& stat
         }
 
         // 4. Food
-        if (head == board.foodPos) {
+        if (head == board.foodPos()) {
             reports.push_back({static_cast<int>(i), CollisionType::Food, head});
         }
 
         // 5. Obstacle
-        if (board.obstacles.count(head)) {
+        if (board.obstacles().count(head)) {
             reports.push_back({static_cast<int>(i), CollisionType::Obstacle, head});
         }
     }

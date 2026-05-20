@@ -8,8 +8,8 @@ GameScene::GameScene(QObject* parent) : QGraphicsScene(parent) {
 
 void GameScene::syncFromState(const GameState& state) {
     const auto& board = state.board;
-    m_boardW = board.width;
-    m_boardH = board.height;
+    m_boardW = board.width();
+    m_boardH = board.height();
     int pixelW = m_boardW * SnakeItem::cellSize;
     int pixelH = m_boardH * SnakeItem::cellSize;
     setSceneRect(0, 0, pixelW, pixelH);
@@ -65,7 +65,7 @@ void GameScene::syncFromState(const GameState& state) {
         m_foodItem = new FoodItem();
         addItem(m_foodItem);
     }
-    m_foodItem->setPos(cellToPixel(board.foodPos.x), cellToPixel(board.foodPos.y));
+    m_foodItem->setPos(cellToPixel(board.foodPos().x), cellToPixel(board.foodPos().y));
 }
 
 void GameScene::clearAll() {

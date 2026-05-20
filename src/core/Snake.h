@@ -7,8 +7,9 @@
 
 /// \brief 蛇模型（数据 + 自身行为）
 /// \details 管理身体段、移动、增长、方向控制。
-///          碰撞检测由 CollisionComponent 通过空闲集统一处理。
+///          碰撞检测由 CollisionComponent 通过 Board grid 位掩码处理。
 ///          move() 在头部插入新坐标，尾部弹出（growNext 时除外）。
+///          growPending() 读即消费——调用后 m_growNext 被清除。
 ///          不做边界检测——边界由 Controller 处理。
 
 class Snake {
@@ -26,11 +27,14 @@ public:
 
     const std::vector<Point>& body() const;
     Point head() const;
+    Point tail() const;
 
-    /// \brief grow() 是否已被调用但尚未在 move() 中生效
-    bool growPending() const { return m_growNext; }
+    /// \brief grow() 是否已被调用（读即消费——调用后自动清除标记）
+    bool growPending() { bool was = m_growNext; m_growNext = false; return was; }
 
 private:
+    Point nextHead() const;
+
     std::vector<Point> m_body;
     Direction m_direction = Direction::Right;
     bool m_growNext = false;

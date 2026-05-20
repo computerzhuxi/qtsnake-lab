@@ -30,17 +30,21 @@ Direction Snake::direction() const {
     return m_direction;
 }
 
-void Snake::move() {
-    Point newHead = head();
+Point Snake::nextHead() const {
+    Point h = head();
     switch (m_direction) {
-        case Direction::Up:    newHead.y -= 1; break;
-        case Direction::Down:  newHead.y += 1; break;
-        case Direction::Left:  newHead.x -= 1; break;
-        case Direction::Right: newHead.x += 1; break;
+        case Direction::Up:    h.y -= 1; break;
+        case Direction::Down:  h.y += 1; break;
+        case Direction::Left:  h.x -= 1; break;
+        case Direction::Right: h.x += 1; break;
     }
-    m_body.insert(m_body.begin(), newHead);
+    return h;
+}
+
+void Snake::move() {
+    m_body.insert(m_body.begin(), nextHead());
     if (m_growNext) {
-        m_growNext = false;
+        // 增长时不 pop_back；m_growNext 由后续 growPending() 消费
     } else {
         m_body.pop_back();
     }
@@ -56,4 +60,8 @@ const std::vector<Point>& Snake::body() const {
 
 Point Snake::head() const {
     return m_body.front();
+}
+
+Point Snake::tail() const {
+    return m_body.back();
 }

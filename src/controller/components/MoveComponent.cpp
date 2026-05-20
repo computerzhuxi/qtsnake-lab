@@ -1,25 +1,19 @@
 #include "MoveComponent.h"
 
-void MoveComponent::init(GameState& state) {
-    auto& b = state.board;
-    b.freeCells.clear();
-    for (int y = 0; y < b.height; ++y)
-        for (int x = 0; x < b.width; ++x)
-            b.freeCells.insert({x, y});
-    for (auto& s : state.snakes)
-        for (auto& seg : s.body())
-            b.freeCells.erase(seg);
-}
-
 void MoveComponent::update(GameState& state) {
-    auto& free = state.board.freeCells;
-    for (auto& s : state.snakes) {
-        Point tail = s.body().back();
-        bool grew = s.growPending();
-        s.move();
-        if (!grew) {
-            free.insert(tail);  // 旧尾释放
-        }
-        // 新头不移除——留给 CollisionComponent 处理
+    auto& board = state.board;
+    for (size_t i = 0; i < state.snakes.size(); ++i) {
+        Point oldHead = state.snakes[i].head();
+        Point oldTail = state.snakes[i].tail();
+        state.snakes[i].move();
+        bool ate = state.snakes[i].growPending();  // 读即消费 m_growNext
+        Point newHead = state.snakes[i].head();
+
+        board.removeHead(static_cast<int>(i), oldHead);
+        if (!ate)
+            board.removeTail(static_cast<int>(i), oldTail);
+
+        if (!board.isOutOfBounds(newHead))
+            board.placeHead(static_cast<int>(i), newHead);
     }
 }

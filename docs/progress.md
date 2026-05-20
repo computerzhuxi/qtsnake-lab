@@ -12,7 +12,7 @@
 |---|---|---|---|
 | Phase-1 基础骨架（core / ui / controller / app 主流程） | ✅ 已完成 | — / 2026-05 前 | 现有代码与测试 |
 | **Phase-2 巩固重构** | ✅ 已完成 | **2026-05-18 ~ 2026-05-19** | 10 正式 + 3 hotfix = 13 张，46 测试全绿 |
-| **Phase-3 打磨（UI + 碰撞重构）** | **🔄 进行中** | **2026-05-19** | 碰撞重构 6 张 + UI 6 张 = 12 张，严格串行 |
+| **Phase-3 打磨（UI + 碰撞重构）** | **🔄 进行中** | **2026-05-19** | 分支 `phase-3-collision-refactor`；T-11~T-13 铺设接口，T-13a 增量位掩码重构，T-14~T-15 收尾 |
 | Phase-4 联机对战 | ⏸ 未启动 | — | 依赖 T-09 状态机测试基线 |
 | Phase-5 回放 | ⏸ 未启动 | — | 依赖 T-03 / T-09 |
 | Phase-6 i18n + 音效落地 | ⏸ 未启动 | — | 无强依赖 |
@@ -51,9 +51,9 @@
 | T-11 | 碰撞数据结构 + 接口定义 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 文件（2 新增头 + Board 改），46 测试全绿，countdownToPlaying flaky 非本卡引入 |
 | T-12 | NaiveCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 6 文件变更，8 用例，54/54 全绿，算法与伪代码逐行一致 |
 | T-13 | GridCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 4 文件变更，9 用例含 cross-validation，63/63 全绿 |
-| T-14 | CollisionResolver + 测试 | `pending` | — | — | — | 依赖 T-11 |
-| T-15 | MoveComponent 吸收 freeCells + FoodSpawner | `pending` | — | — | — | 依赖 T-11 |
-| T-16 | Controller 流水线重构 + 删旧组件 | `pending` | — | — | — | 依赖 T-12~T-15 |
+| T-14 | Board struct→class + Snake growPending 读即消费 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 15 文件变更，Board.cpp 新增，63/63 全绿 |
+| T-15 | MoveComponent 调 Board 方法 + CollisionComponent 纯 detect() | `pending` | — | — | — | 依赖 T-14 |
+| T-16 | FoodSpawner + Controller 流水线 + 删 ICollisionDetector/Naive/Grid | `pending` | — | — | — | 依赖 T-15 |
 | T-17 | SnakeItem 渐变色 + 发光 | `pending` | — | — | — | — |
 | T-18 | FoodItem 光晕 + GameScene 网格线 | `pending` | — | — | — | — |
 | T-19 | InfoBar + LeaderboardWidget | `pending` | — | — | — | — |
@@ -69,6 +69,7 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-19 | T-14 | **通过（passed）** | Board class 封装 grid+freeCells；Snake growPending 读即消费；MoveComponent move→读→removeHead→removeTail→placeHead；63/63 全绿 |
 | 2026-05-19 | T-13 | **通过（passed）** | Grid + epoch 算法正确；9 用例含 cross-validation 100 随机状态一致；63/63 全绿 |
 | 2026-05-19 | T-12 | **通过（passed）** | NaiveCollisionDetector 算法与伪代码逐行一致；8 用例覆盖全部 7 种 CollisionType；54/54 全绿 /W4 零警告 |
 | 2026-05-19 | T-11 | **通过（passed）** | CollisionReport.h / ICollisionDetector.h / Board.h 全部达标；46/46 全绿 |

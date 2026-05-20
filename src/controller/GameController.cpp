@@ -31,8 +31,7 @@ void GameController::startGame(int boardW, int boardH, int speedMs) {
     m_timer->setInterval(speedMs);
 
     m_state = GameState{};
-    m_state.board.width = boardW;
-    m_state.board.height = boardH;
+    m_state.board.setSize(boardW, boardH);
 
     Point spawn(m_rng->intInRange(0, boardW - 1), m_rng->intInRange(0, boardH - 1));
 
@@ -49,6 +48,7 @@ void GameController::startGame(int boardW, int boardH, int speedMs) {
     Direction dir = cnt > 0 ? safe[m_rng->intInRange(0, cnt - 1)] : Direction::Right;
 
     m_state.snakes.emplace_back(spawn, dir);
+    m_state.board.initFromSnakes(m_state.snakes);
 
     initComponents();
     m_phase = State::Ready;
@@ -62,7 +62,6 @@ void GameController::startGame(int boardW, int boardH, int speedMs) {
 
 void GameController::initComponents() {
     m_input->init(m_state);
-    m_move->init(m_state);
     m_food->init(m_state);
 }
 

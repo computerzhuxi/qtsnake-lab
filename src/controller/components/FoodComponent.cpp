@@ -12,9 +12,9 @@ void FoodComponent::init(GameState& state) {
 void FoodComponent::update(GameState& state) {
     if (state.gameOver) return;
     for (auto& s : state.snakes) {
-        if (s.head() == state.board.foodPos) {
+        if (s.head() == state.board.foodPos()) {
             s.grow();
-            state.score += state.board.foodPoints;
+            state.score += state.board.foodPoints();
             spawnFood(state);
             return;
         }
@@ -23,10 +23,11 @@ void FoodComponent::update(GameState& state) {
 
 void FoodComponent::spawnFood(GameState& state) {
     auto& b = state.board;
-    if (b.freeCells.empty()) return;
-    auto it = b.freeCells.begin();
-    int target = m_rng->intInRange(0, static_cast<int>(b.freeCells.size()) - 1);
+    if (b.freeCells().empty()) return;
+    auto it = b.freeCells().begin();
+    int target = m_rng->intInRange(0, static_cast<int>(b.freeCells().size()) - 1);
     std::advance(it, target);
-    b.foodPos = *it;
-    b.freeCells.erase(it);
+    Point food = *it;
+    b.removeFreeCell(food);
+    b.setFood(food);
 }

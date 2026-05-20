@@ -4,12 +4,10 @@
 #include "GameState.h"
 
 /// \brief 移动组件
-/// \details update(): 蛇移动 → 旧尾 insert 回空闲集（释放）。
-///          新头不 erase——留给 CollisionComponent 在碰撞通过后处理。
-///          init() 首次构建完整空闲格集。
+/// \details update(): 蛇移动 → 通过 Board::placeHead/removeTail 维护位掩码网格。
+///          grid + freeCells 由 GameController::startGame() 通过 board.initFromSnakes() 构建。
 class MoveComponent {
 public:
-    void init(GameState& state);
     void update(GameState& state);
 };
 

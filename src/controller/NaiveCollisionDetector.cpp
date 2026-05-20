@@ -10,19 +10,19 @@ std::vector<CollisionReport> NaiveCollisionDetector::detect(const GameState& sta
         Point head = snakes[i].head();
 
         // 1. Wall
-        if (head.x < 0 || head.x >= board.width ||
-            head.y < 0 || head.y >= board.height) {
+        if (head.x < 0 || head.x >= board.width() ||
+            head.y < 0 || head.y >= board.height()) {
             reports.push_back({static_cast<int>(i), CollisionType::Wall, head});
             continue;
         }
 
         // 2. Food
-        if (head == board.foodPos) {
+        if (head == board.foodPos()) {
             reports.push_back({static_cast<int>(i), CollisionType::Food, head});
         }
 
         // 3. Obstacle
-        if (board.obstacles.count(head)) {
+        if (board.obstacles().count(head)) {
             reports.push_back({static_cast<int>(i), CollisionType::Obstacle, head});
         }
 

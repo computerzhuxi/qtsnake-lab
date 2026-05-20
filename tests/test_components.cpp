@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include "GameState.h"
-#include "components/MoveComponent.h"
-#include "components/CollisionComponent.h"
-#include "components/FoodComponent.h"
-#include "components/InputComponent.h"
+#include "MoveComponent.h"
+#include "CollisionComponent.h"
+#include "FoodSpawner.h"
+#include "InputComponent.h"
 #include "RngService.h"
 #include "Snake.h"
 
@@ -66,7 +66,7 @@ TEST(CollisionComponent, headInFreeCellsIsSafe) {
     s.board.setSize(10, 10);
     s.snakes.emplace_back(Point{5, 5});
     s.board.initFromSnakes(s.snakes);
-    s.board.setFood(Point{8, 8});
+    s.food.placeAt(Point{8, 8}, s.board);
     s.board.removeFreeCell(Point{8, 8});
 
     MoveComponent move;
@@ -81,7 +81,7 @@ TEST(CollisionComponent, headOnFoodIsSafe) {
     s.board.setSize(10, 10);
     s.snakes.emplace_back(Point{5, 5});
     s.board.initFromSnakes(s.snakes);
-    s.board.setFood(Point{6, 5});
+    s.food.placeAt(Point{6, 5}, s.board);
     s.board.removeFreeCell(Point{6, 5});
 
     MoveComponent move;
@@ -98,7 +98,7 @@ TEST(CollisionComponent, headOutsideBoardIsDead) {
     s.board.setSize(10, 10);
     s.snakes.emplace_back(Point{9, 5});
     s.board.initFromSnakes(s.snakes);
-    s.board.setFood(Point{0, 0});
+    s.food.placeAt(Point{0, 0}, s.board);
     s.board.removeFreeCell(Point{0, 0});
 
     s.snakes[0].setDirection(Direction::Right);
@@ -114,7 +114,7 @@ TEST(CollisionComponent, headOnSnakeBodyIsDead) {
     GameState s;
     s.board.setSize(10, 10);
     s.snakes.emplace_back(Point{5, 5});
-    s.board.setFood(Point{0, 0});
+    s.food.placeAt(Point{0, 0}, s.board);
     s.board.initFromSnakes(s.snakes);
 
     // 通过 Board API 在 (6,5) 模拟身体段占据
@@ -129,44 +129,62 @@ TEST(CollisionComponent, headOnSnakeBodyIsDead) {
     EXPECT_EQ(reports[0].snakeIndex, 0);
 }
 
-// ========== FoodComponent ==========
+// ========== FoodSpawner ==========
 
-TEST(FoodComponent, initSpawnsFoodInsideFreeCells) {
+TEST(FoodSpawner, initSpawnsFoodInsideFreeCells) {
     GameState s;
     s.board.setSize(10, 10);
     s.snakes.emplace_back(Point{5, 5});
     s.board.initFromSnakes(s.snakes);
     RngService rng;
-    FoodComponent food(&rng);
+    FoodSpawner food(&rng);
     food.init(s);
-    EXPECT_FALSE(s.board.freeCells().count(s.board.foodPos()));
+    EXPECT_FALSE(s.board.freeCells().count(s.food.position()));
 }
 
-TEST(FoodComponent, eatingFoodGrowsSnakeAndSpawnsNew) {
+TEST(FoodSpawner, eatingFoodGrowsSnakeAndSpawnsNew) {
     GameState s;
     s.board.setSize(10, 10);
     s.snakes.emplace_back(Point{5, 5});
     s.board.initFromSnakes(s.snakes);
     RngService rng2;
-    FoodComponent foodComp(&rng2);
-    foodComp.init(s);
+    FoodSpawner foodSpawner(&rng2);
+    foodSpawner.init(s);
 
-    s.board.addFreeCell(s.board.foodPos());
-    s.board.setFood(Point{6, 5});
+    s.board.addFreeCell(s.food.position());
+    s.food.placeAt(Point{6, 5}, s.board);
     s.board.removeFreeCell(Point{6, 5});
 
     int oldLen = static_cast<int>(s.snakes[0].body().size());
     int oldScore = s.score;
 
+    // tick N: move → head to (6,5)
     MoveComponent move;
     move.update(s);
-    foodComp.update(s);
 
+    // tick N: collision detect + process response
+    CollisionComponent coll;
+    auto reports = coll.detect(s);
+    bool ate = false;
+    for (auto& r : reports) {
+        if (r.type == CollisionType::Food && r.snakeIndex == 0) {
+            s.snakes[0].grow();
+            s.score += s.food.points();
+            s.food.markEaten();
+            ate = true;
+        }
+    }
+    ASSERT_TRUE(ate);
+
+    // tick N: spawn new food
+    foodSpawner.spawn(s);
+
+    // tick N+1: move → snake grows
     move.update(s);
     EXPECT_GT(s.snakes[0].body().size(), oldLen);
     EXPECT_GT(s.score, oldScore);
-    EXPECT_NE(s.board.foodPos(), Point(6, 5));
-    EXPECT_FALSE(s.board.freeCells().count(s.board.foodPos()));
+    EXPECT_NE(s.food.position(), Point(6, 5));
+    EXPECT_FALSE(s.board.freeCells().count(s.food.position()));
 }
 
 // ========== InputComponent ==========

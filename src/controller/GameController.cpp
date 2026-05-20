@@ -1,9 +1,9 @@
 #include "GameController.h"
-#include "components/InputComponent.h"
-#include "components/MoveComponent.h"
-#include "components/CollisionComponent.h"
-#include "components/FoodComponent.h"
-#include "components/RenderComponent.h"
+#include "InputComponent.h"
+#include "MoveComponent.h"
+#include "CollisionComponent.h"
+#include "FoodSpawner.h"
+#include "RenderComponent.h"
 #include "RngService.h"
 #include "GameScene.h"
 #include "Logger.h"
@@ -16,7 +16,7 @@ GameController::GameController(GameScene* scene)
     , m_move(std::make_unique<MoveComponent>())
     , m_collision(std::make_unique<CollisionComponent>())
     , m_rng(std::make_unique<RngService>())
-    , m_food(std::make_unique<FoodComponent>(m_rng.get()))
+    , m_food(std::make_unique<FoodSpawner>(m_rng.get()))
     , m_render(std::make_unique<RenderComponent>(scene))
 {
     connect(m_timer, &QTimer::timeout, this, &GameController::update);
@@ -137,7 +137,8 @@ void GameController::update() {
     auto reports = m_collision->detect(m_state);
     processCollisions(reports);
 
-    m_food->update(m_state);
+    if (m_state.food.isEaten())
+        m_food->spawn(m_state);
 
     if (m_state.gameOver) {
         m_timer->stop();
@@ -170,6 +171,7 @@ void GameController::processCollisions(const std::vector<CollisionReport>& repor
         case CollisionType::Food:
             if (alive[r.snakeIndex]) {
                 snake.grow();
+                m_state.score += m_state.food.points();
                 anyoneAte = true;
             }
             break;
@@ -182,5 +184,5 @@ void GameController::processCollisions(const std::vector<CollisionReport>& repor
     if (allDead) m_state.gameOver = true;
 
     if (anyoneAte)
-        m_state.board.markFoodEaten();
+        m_state.food.markEaten();
 }

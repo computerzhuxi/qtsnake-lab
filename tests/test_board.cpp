@@ -18,8 +18,3 @@ TEST(Board, freeCellsEmptyByDefault) {
     Board board;
     EXPECT_TRUE(board.freeCells().empty());
 }
-
-TEST(Board, foodPosDefaultIsOrigin) {
-    Board board;
-    EXPECT_EQ(board.foodPos(), Point(0, 0));
-}

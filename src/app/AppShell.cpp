@@ -2,7 +2,7 @@
 #include "MainMenuWidget.h"
 #include "GamePage.h"
 #include "SettingsWidget.h"
-#include "components/InputComponent.h"
+#include "InputComponent.h"
 #include "Logger.h"
 #include <QVBoxLayout>
 #include <QKeyEvent>

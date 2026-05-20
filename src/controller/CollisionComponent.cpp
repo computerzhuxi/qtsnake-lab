@@ -36,7 +36,7 @@ std::vector<CollisionReport> CollisionComponent::detect(const GameState& state) 
         }
 
         // 3. Food / Obstacle
-        if (cell.hasFood) {
+        if (head == state.food.position()) {
             reports.push_back({si, CollisionType::Food, head});
         }
         if (cell.hasObstacle) {

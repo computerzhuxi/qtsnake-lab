@@ -7,16 +7,15 @@
 #include "Point.h"
 #include "Snake.h"
 
-/// \brief 棋盘地图（封装位掩码网格 + 空闲集）
+/// \brief 棋盘地图（纯空间索引：位掩码网格 + 空闲集）
 /// \details 位掩码网格由 MoveComponent 通过 placeHead/removeTail 维护，
-///          空闲集保留给 FoodComponent 用。所有字段私有，通过方法访问。
+///          空闲集保留给 FoodSpawner 用。所有字段私有，通过方法访问。
 class Board {
 public:
     /// \brief 单个格子的位掩码信息
     struct CellInfo {
         uint8_t snakeMask = 0;   // bit i = 第 i 条蛇有身体段在此
         uint8_t headMask  = 0;   // bit i = 第 i 条蛇的头在此
-        bool hasFood      = false;
         bool hasObstacle  = false;
     };
 
@@ -40,15 +39,8 @@ public:
     bool isOutOfBounds(Point pos) const;
     const CellInfo& cellAt(Point pos) const;
 
-    // -- 食物 --
-    Point foodPos() const              { return m_foodPos; }
-    void setFood(Point pos);
-    void clearFood(Point pos);
-    int foodPoints() const             { return m_foodPoints; }
-    void setFoodPoints(int pts)        { m_foodPoints = pts; }
-    bool isFoodEaten() const           { return m_foodEaten; }
-    void markFoodEaten()               { m_foodEaten = true; }
-    void clearFoodEaten()              { m_foodEaten = false; }
+    // -- 食物标记（仅设 grid 位，由 Food::placeAt/remove 调用） --
+    void setFoodFlag(Point pos, bool value);
 
     // -- 空闲集 --
     const std::unordered_set<Point>& freeCells() const { return m_freeCells; }
@@ -64,9 +56,6 @@ private:
     int m_height = 20;
     std::unordered_set<Point> m_freeCells;
     std::vector<std::vector<CellInfo>> m_grid;
-    Point m_foodPos;
-    int m_foodPoints = 1;
-    bool m_foodEaten = false;
     std::unordered_set<Point> m_obstacles;
 
     void ensureGrid(int w, int h);

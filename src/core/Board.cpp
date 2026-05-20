@@ -66,13 +66,9 @@ const Board::CellInfo& Board::cellAt(Point pos) const {
     return m_grid[pos.y][pos.x];
 }
 
-void Board::setFood(Point pos) {
-    m_foodPos = pos;
-    m_grid[pos.y][pos.x].hasFood = true;
-}
-
-void Board::clearFood(Point pos) {
-    m_grid[pos.y][pos.x].hasFood = false;
+void Board::setFoodFlag(Point pos, bool /*value*/) {
+    // 食物标记由 Food 类管理；Board 仅保留接口以备将来 grid 渲染需要
+    (void)pos;
 }
 
 void Board::addObstacle(Point pos) {

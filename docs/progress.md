@@ -53,7 +53,8 @@
 | T-13 | GridCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 4 文件变更，9 用例含 cross-validation，63/63 全绿 |
 | T-14 | Board struct→class + Snake growPending 读即消费 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 15 文件变更，Board.cpp 新增，63/63 全绿 |
 | T-15 | CollisionComponent 纯 detect + Controller processCollisions | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | detect const 纯检测，processCollisions 先死后吃，63/63 全绿 |
-| T-16 | FoodSpawner + Controller 流水线 + 删 ICollisionDetector/Naive/Grid | `pending` | — | — | — | 依赖 T-15 |
+| T-16 | FoodSpawner + 删旧文件 + Controller 流水线收尾 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 6 旧文件删除，46/46 全绿 |
+| T-16a | Food class + Board 删食物 + 文件整理 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | Food class 集中食物状态，Board 回归空间索引，controller 打平，45/45 全绿 |
 | T-17 | SnakeItem 渐变色 + 发光 | `pending` | — | — | — | — |
 | T-18 | FoodItem 光晕 + GameScene 网格线 | `pending` | — | — | — | — |
 | T-19 | InfoBar + LeaderboardWidget | `pending` | — | — | — | — |

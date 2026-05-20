@@ -11,7 +11,7 @@ class GameScene;
 class InputComponent;
 class MoveComponent;
 class CollisionComponent;
-class FoodComponent;
+class FoodSpawner;
 class RenderComponent;
 class RngService;
 
@@ -79,7 +79,7 @@ private:
     std::unique_ptr<MoveComponent> m_move;           ///< 蛇移动 + 空闲格
     std::unique_ptr<CollisionComponent> m_collision; ///< 碰撞检测
     std::unique_ptr<RngService> m_rng;               ///< 集中随机数服务（须在 m_food 前）
-    std::unique_ptr<FoodComponent> m_food;           ///< 食物管理
+    std::unique_ptr<FoodSpawner> m_food;              ///< 食物生成
     std::unique_ptr<RenderComponent> m_render;       ///< 渲染同步
 
     GameState m_state;                               ///< 当前游戏状态

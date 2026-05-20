@@ -3,10 +3,25 @@
 
 #include "Point.h"
 
-/// \brief 食物，包含位置和分值
-struct Food {
-    Point position;
-    int points = 1;
+class Board;
+
+class Food {
+public:
+    Food(int points = 1);
+
+    Point position() const;
+    int points() const;
+    bool isEaten() const;
+
+    void placeAt(Point pos, Board& board);
+    void remove(Board& board);
+    void markEaten();
+    void clearEaten();
+
+private:
+    Point m_position;
+    int m_points = 1;
+    bool m_eaten = false;
 };
 
-#endif // SNAKE_CORE_FOOD_H
+#endif

@@ -65,7 +65,7 @@ void GameScene::syncFromState(const GameState& state) {
         m_foodItem = new FoodItem();
         addItem(m_foodItem);
     }
-    m_foodItem->setPos(cellToPixel(board.foodPos().x), cellToPixel(board.foodPos().y));
+    m_foodItem->setPos(cellToPixel(state.food.position().x), cellToPixel(state.food.position().y));
 }
 
 void GameScene::clearAll() {

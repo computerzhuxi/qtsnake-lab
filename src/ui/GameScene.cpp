@@ -41,7 +41,12 @@ void GameScene::syncFromState(const GameState& state) {
             removeItem(item);
             delete item;
         }
-        for (int j = 0; j < static_cast<int>(body.size()); ++j) {
+        int total = static_cast<int>(body.size());
+        for (int j = 0; j < total; ++j) {
+            float t = total > 1 ? float(j) / (total - 1) : 0.0f;
+            int g = 255 - static_cast<int>(68 * t);
+            int b = 136 - static_cast<int>(51 * t);
+            items[j]->setColor(QColor(0, g, b));
             items[j]->setPos(cellToPixel(body[j].x), cellToPixel(body[j].y));
             items[j]->setIsHead(j == 0);
         }

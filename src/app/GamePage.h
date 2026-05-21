@@ -33,6 +33,10 @@ public:
     void showCountdown(int number);
     void hideAllOverlays();
 
+    /// \brief 每 tick 更新 UI 数据（InfoBar + Leaderboard）
+    void updateStats(int score, int length, int timeSec,
+                     int speedMs, int kills, int rank, int totalPlayers);
+
 signals:
     void resumeClicked();
     void restartClicked();

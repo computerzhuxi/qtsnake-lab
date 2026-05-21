@@ -29,6 +29,8 @@ protected:
 private slots:
     void onControllerStateChanged(GameController::State state);
     void onCountdownTick(int number);
+    void onStatsUpdated(int score, int length, int timeSec,
+                        int speedMs, int kills, int rank, int totalPlayers);
 
 private:
     void setupUI();

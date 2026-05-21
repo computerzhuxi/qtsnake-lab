@@ -52,6 +52,9 @@ public:
     State state() const { return m_phase; }
     const GameState& gameState() const { return m_state; }
     int score() const { return m_state.score; }
+    int kills() const { return m_kills; }
+    int elapsedSec() const { return m_elapsedSec; }
+    int speedMs() const { return m_speedMs; }
 
     /// \brief 输入组件指针（AppShell 用 setDirection() 转发方向键）
     InputComponent* input() const { return m_input.get(); }

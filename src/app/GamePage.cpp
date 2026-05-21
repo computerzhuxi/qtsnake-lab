@@ -116,6 +116,27 @@ void GamePage::showCountdown(int number) {
     m_countdownLabel->raise();
 }
 
+void GamePage::updateStats(int score, int length, int timeSec,
+                           int speedMs, int kills, int rank, int totalPlayers) {
+    if (m_infoBar) {
+        m_infoBar->setScore(score);
+        m_infoBar->setLength(length);
+        m_infoBar->setTime(timeSec);
+        m_infoBar->setSpeed(speedMs);
+        m_infoBar->setKills(kills);
+        m_infoBar->setRank(rank, totalPlayers);
+    }
+
+    if (m_leaderboard) {
+        PlayerInfo self;
+        self.name = "YOU";
+        self.score = score;
+        self.alive = true;
+        self.isSelf = true;
+        m_leaderboard->updatePlayers({self});
+    }
+}
+
 void GamePage::hideAllOverlays() {
     m_pauseWidget->hide();
     m_gameOver->hide();

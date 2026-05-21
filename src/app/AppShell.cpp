@@ -105,8 +105,11 @@ void AppShell::startSinglePlayer() {
     connect(m_controller.get(), &GameController::scoreChanged, this, [this](int score) {
         m_currentScore = score;
     });
+    connect(m_controller.get(), &GameController::statsUpdated,
+            this, &AppShell::onStatsUpdated);
 
     m_controller->startGame(20, 20, 100);
+    m_gamePage->updateStats(0, 3, 0, m_controller->speedMs(), 0, 1, 1);
     m_gamePage->view()->fitInView(m_gamePage->scene()->sceneRect(), Qt::KeepAspectRatio);
     setFocus();
 }
@@ -155,7 +158,9 @@ void AppShell::onControllerStateChanged(GameController::State state) {
         case GameController::State::GameOver: {
             const auto& gs = m_controller->gameState();
             int len = gs.snakes.empty() ? 0 : static_cast<int>(gs.snakes[0].body().size());
-            m_gamePage->showGameOver(m_currentScore, len, 0, 0);
+            m_gamePage->showGameOver(m_currentScore, len,
+                                     m_controller->kills(),
+                                     m_controller->elapsedSec());
             break;
         }
         case GameController::State::Playing:
@@ -168,4 +173,10 @@ void AppShell::onControllerStateChanged(GameController::State state) {
 
 void AppShell::onCountdownTick(int number) {
     m_gamePage->showCountdown(number);
+}
+
+void AppShell::onStatsUpdated(int score, int length, int timeSec,
+                               int speedMs, int kills, int rank, int totalPlayers) {
+    m_currentScore = score;
+    m_gamePage->updateStats(score, length, timeSec, speedMs, kills, rank, totalPlayers);
 }

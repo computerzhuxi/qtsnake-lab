@@ -5,6 +5,7 @@
 #include "InputComponent.h"
 #include "Logger.h"
 #include <QVBoxLayout>
+#include <QSizePolicy>
 #include <QKeyEvent>
 
 AppShell::AppShell(QWidget* parent) : QWidget(parent) {
@@ -54,6 +55,7 @@ void AppShell::setupUI() {
     layout->setContentsMargins(0, 0, 0, 0);
 
     m_stack = new QStackedWidget(this);
+    m_stack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_mainMenu = new MainMenuWidget(this);
     m_gamePage = new GamePage(this);

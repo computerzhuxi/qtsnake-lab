@@ -1,8 +1,12 @@
 #include "GamePage.h"
+#include "InfoBar.h"
+#include "LeaderboardWidget.h"
 #include "PauseWidget.h"
 #include "GameOverWidget.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QSizePolicy>
 #include <QStyle>
 
 GamePage::GamePage(QWidget* parent) : QWidget(parent) {
@@ -10,9 +14,23 @@ GamePage::GamePage(QWidget* parent) : QWidget(parent) {
     m_view = new GameView(this);
     m_view->setScene(m_scene);
 
-    auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_view);
+    auto* root = new QVBoxLayout(this);
+    root->setContentsMargins(0, 0, 0, 0);
+    root->setSpacing(0);
+
+    m_infoBar = new InfoBar(this);
+    root->addWidget(m_infoBar);
+
+    auto* body = new QHBoxLayout;
+    body->setContentsMargins(0, 0, 0, 0);
+    body->setSpacing(0);
+
+    body->addWidget(m_view, 1);
+
+    m_leaderboard = new LeaderboardWidget(this);
+    body->addWidget(m_leaderboard);
+
+    root->addLayout(body, 1);
 
     m_pauseWidget = new PauseWidget(this);
     m_gameOver = new GameOverWidget(this);
@@ -28,6 +46,8 @@ GamePage::GamePage(QWidget* parent) : QWidget(parent) {
     connect(m_pauseWidget, &PauseWidget::menuClicked, this, &GamePage::menuClicked);
     connect(m_gameOver, &GameOverWidget::playAgainClicked, this, &GamePage::playAgainClicked);
     connect(m_gameOver, &GameOverWidget::menuClicked, this, &GamePage::menuClicked);
+
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 GameScene* GamePage::scene() const { return m_scene; }

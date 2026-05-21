@@ -3,6 +3,7 @@
 #include "LeaderboardWidget.h"
 #include "PauseWidget.h"
 #include "GameOverWidget.h"
+#include "ShineLabel.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -40,6 +41,12 @@ GamePage::GamePage(QWidget* parent) : QWidget(parent) {
     m_countdownLabel->setAlignment(Qt::AlignCenter);
     m_countdownLabel->hide();
 
+    m_shineLabel = new ShineLabel(this);
+    m_shineLabel->setObjectName("shineLabel");
+    m_shineLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    m_shineLabel->setFont(QFont("Consolas", 18));
+    m_shineLabel->hide();
+
     connect(m_pauseWidget, &PauseWidget::resumeClicked, this, &GamePage::resumeClicked);
     connect(m_pauseWidget, &PauseWidget::restartClicked, this, &GamePage::restartClicked);
     connect(m_pauseWidget, &PauseWidget::settingsClicked, this, &GamePage::settingsClicked);
@@ -76,14 +83,22 @@ void GamePage::showGameOver(int score, int length, int kills, int seconds) {
 }
 
 void GamePage::showCountdown(int number) {
+    if (number == -1) {
+        m_countdownLabel->hide();
+        m_shineLabel->setText(tr("按任意键开始"));
+        m_shineLabel->show();
+        m_shineLabel->raise();
+        m_shineLabel->startShine();
+        return;
+    }
+
+    m_shineLabel->stopShine();
+    m_shineLabel->hide();
+
     QString text;
     Qt::Alignment align;
 
-    if (number == -1) {
-        text = tr("按任意键开始");
-        m_countdownLabel->setProperty("state", "hint");
-        align = Qt::AlignHCenter | Qt::AlignBottom;
-    } else if (number == 0) {
+    if (number == 0) {
         text = "GO!";
         m_countdownLabel->setProperty("state", "go");
         align = Qt::AlignCenter;
@@ -105,6 +120,8 @@ void GamePage::hideAllOverlays() {
     m_pauseWidget->hide();
     m_gameOver->hide();
     m_countdownLabel->hide();
+    m_shineLabel->stopShine();
+    m_shineLabel->hide();
 }
 
 void GamePage::resizeEvent(QResizeEvent* event) {
@@ -114,6 +131,7 @@ void GamePage::resizeEvent(QResizeEvent* event) {
     m_pauseWidget->setGeometry(0, 0, w, h);
     m_gameOver->setGeometry(0, 0, w, h);
     m_countdownLabel->setGeometry(0, 0, w, h);
+    m_shineLabel->setGeometry(0, 0, w, static_cast<int>(h * 0.95));
 
     if (m_scene && !m_scene->sceneRect().isEmpty()) {
         m_view->fitInView(m_scene->sceneRect(), Qt::KeepAspectRatio);

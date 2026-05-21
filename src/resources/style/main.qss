@@ -87,7 +87,6 @@ QWidget#panel {
 
 /* 倒计时 */
 QLabel#CountdownLabel { background: transparent; }
-QLabel#CountdownLabel[state="hint"] { font-size: 18px; color: #556; padding-bottom: 60px; }
 QLabel#CountdownLabel[state="count"] { font-size: 72px; color: #00ff88; }
 QLabel#CountdownLabel[state="go"] { font-size: 72px; color: #00ff88; }
 

@@ -57,8 +57,8 @@
 | T-16a | Food class + Board 删食物 + 文件整理 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | Food class 集中食物状态，Board 回归空间索引，controller 打平，45/45 全绿 |
 | T-17 | SnakeItem 渐变色 + 发光 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | setColor + 渐变插值 + 4 层霓虹发光，45/45 全绿 |
 | T-18 | FoodItem 光晕 + GameScene 网格线 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 层红色光晕 + drawForeground 网格线，45/45 全绿 |
-| T-19 | InfoBar + LeaderboardWidget | `pending` | — | — | — | — |
-| T-20 | GameOverWidget 多人排名表 | `pending` | — | — | — | — |
+| T-19 | InfoBar + LeaderboardWidget | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | GamePage 三段式布局 + InfoBar 六列居中 + LeaderboardWidget 排名侧栏，含 T-19a HUD 对齐修复 |
+| T-20 | GameOverWidget 多人排名表 + PauseWidget 面板化 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | 两个浮层 overlay→panel 重构 + 双轴居中 + 多人排名表 QGridLayout |
 | T-21 | ShineLabel 反光文字 | `pending` | — | — | — | — |
 | T-22 | SettingsWidget Tab 重构 + QSS 收尾 | `pending` | — | — | — | — |
 

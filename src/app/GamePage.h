@@ -10,6 +10,7 @@ class PauseWidget;
 class GameOverWidget;
 class InfoBar;
 class LeaderboardWidget;
+class ShineLabel;
 class QLabel;
 
 /// \brief 游戏页面
@@ -50,6 +51,7 @@ private:
     PauseWidget* m_pauseWidget;             ///< 暂停浮层
     GameOverWidget* m_gameOver;             ///< 结算浮层
     QLabel* m_countdownLabel;               ///< 倒计时/提示文字
+    ShineLabel* m_shineLabel;               ///< 反光提示文字
 };
 
 #endif // SNAKE_APP_GAMEPAGE_H

@@ -60,7 +60,10 @@
 | T-19 | InfoBar + LeaderboardWidget | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | GamePage 三段式布局 + InfoBar 六列居中 + LeaderboardWidget 排名侧栏，含 T-19a HUD 对齐修复 |
 | T-20 | GameOverWidget 多人排名表 + PauseWidget 面板化 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | 两个浮层 overlay→panel 重构 + 双轴居中 + 多人排名表 QGridLayout |
 | T-21 | ShineLabel 反光文字 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | QLinearGradient + QTimer 绿色亮带扫光动画，h*0.95 动态比例替换 hint QSS
-| T-22 | SettingsWidget Tab 重构 + QSS 收尾 | `pending` | — | — | — | — |
+| T-22 | SettingsWidget Tab 重构 + QSS 收尾 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | overlay→panel 双轴居中 + QPushButton 自定义 Tab + QStackedWidget + QSS 暗色表单
+| T-23 | Controller 数据管道（kills + 时间 + stats 信号） | `pending` | — | — | — | — |
+| T-24 | AppShell/GamePage 接线（InfoBar + LB + GameOver 数据落地） | `pending` | — | — | — | — |
+| T-25 | Settings 集成（速度/大小/键位实际生效） | `pending` | — | — | — | — |
 
 ---
 

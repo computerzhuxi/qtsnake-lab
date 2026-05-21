@@ -220,3 +220,70 @@ QLabel#rankName { color: #ccc; font-size: 12px; }
 QLabel#rankName[alive="false"] { color: #555; }
 QLabel#rankScore { color: #00ff88; font-size: 12px; }
 QLabel#rankScore[alive="false"] { color: #555; }
+
+/* SettingsWidget */
+QWidget#settingsPanel {
+    background: #0a0a1a;
+    border: 1px solid #1a1a4e;
+    border-radius: 10px;
+}
+QLabel#settingsTitle {
+    color: #e0e0ff;
+    font-size: 22px;
+    font-family: monospace;
+    letter-spacing: 6px;
+}
+QPushButton#settingsTab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #556;
+    padding: 8px 0;
+    font-size: 13px;
+    font-family: monospace;
+}
+QPushButton#settingsTab[active="true"] {
+    color: #00ff88;
+    border-bottom-color: #00ff88;
+}
+QLabel#settingsLabel {
+    color: #556;
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+QComboBox#settingsCombo {
+    background: #08081a;
+    border: 1px solid #1a1a4e;
+    border-radius: 4px;
+    color: #0ff;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: monospace;
+}
+QComboBox#settingsCombo:focus {
+    border-color: #00ff88;
+}
+QComboBox#settingsCombo QAbstractItemView {
+    background: #0a0a1a;
+    color: #ccc;
+    selection-background-color: #1a1a4e;
+}
+QSlider#settingsSlider::groove:horizontal {
+    height: 4px;
+    background: #1a1a4e;
+    border-radius: 2px;
+}
+QSlider#settingsSlider::handle:horizontal {
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    background: #00ff88;
+    border-radius: 7px;
+}
+QLabel#settingsSliderValue {
+    color: #00ff88;
+    font-size: 13px;
+    min-width: 24px;
+}

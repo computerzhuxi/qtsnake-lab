@@ -136,11 +136,52 @@ QPushButton#btnExit {
 }
 QPushButton#btnExit:hover { color: #ff6688; }
 
+/* PauseWidget */
+QLabel#pauseTitle {
+    color: #e0e0ff;
+    font-size: 22px;
+    font-family: monospace;
+    letter-spacing: 4px;
+}
+
 /* 结算页 */
 QLabel#gameOverTitle {
     color: #ff6688;
     font-size: 18px;
     letter-spacing: 6px;
+}
+QLabel#goSubtitle {
+    color: #556;
+    font-size: 12px;
+    font-family: monospace;
+    padding-bottom: 8px;
+}
+QLabel#goStats {
+    color: #556;
+    font-size: 12px;
+}
+QLabel#resultHeader {
+    color: #445;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 4px 8px;
+}
+QLabel#resultCell {
+    color: #ccc;
+    font-size: 13px;
+    padding: 5px 8px;
+}
+QLabel#resultCell[you="true"] {
+    color: #00ff88;
+}
+QLabel#resultCell[rankLevel="gold"]   { color: #ffd700; font-weight: bold; }
+QLabel#resultCell[rankLevel="silver"] { color: #c0c0c0; font-weight: bold; }
+QLabel#resultCell[rankLevel="bronze"] { color: #cd7f32; font-weight: bold; }
+QLabel#resultCell[alive="true"]  { color: #00ff88; }
+QLabel#resultCell[alive="false"] { color: #ff6688; }
+QWidget#resultDivider {
+    background: #0a0a0a;
+    max-height: 1px;
 }
 
 /* InfoBar */

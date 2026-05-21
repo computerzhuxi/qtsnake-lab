@@ -70,7 +70,7 @@ void GamePage::showPause() {
 
 void GamePage::showGameOver(int score, int length, int kills, int seconds) {
     hideAllOverlays();
-    m_gameOver->setScore(score, length, kills, seconds);
+    m_gameOver->setSingleResult(score, length, kills, seconds);
     m_gameOver->show();
     m_gameOver->raise();
 }

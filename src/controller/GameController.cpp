@@ -7,6 +7,7 @@
 #include "RngService.h"
 #include "GameScene.h"
 #include "Logger.h"
+#include <QDateTime>
 
 GameController::GameController(GameScene* scene)
     : QObject(nullptr)
@@ -32,6 +33,10 @@ void GameController::startGame(int boardW, int boardH, int speedMs) {
 
     m_state = GameState{};
     m_state.board.setSize(boardW, boardH);
+
+    m_kills = 0;
+    m_gameStartMs = 0;
+    m_elapsedSec = 0;
 
     Point spawn(m_rng->intInRange(0, boardW - 1), m_rng->intInRange(0, boardH - 1));
 
@@ -140,6 +145,19 @@ void GameController::update() {
     if (m_state.food.isEaten())
         m_food->spawn(m_state);
 
+    // 每 tick 更新耗时
+    if (m_gameStartMs == 0) {
+        m_gameStartMs = QDateTime::currentMSecsSinceEpoch();
+    }
+    m_elapsedSec = static_cast<int>(
+        (QDateTime::currentMSecsSinceEpoch() - m_gameStartMs) / 1000);
+
+    // Emit stats for UI
+    int len = m_state.snakes.empty() ? 0
+              : static_cast<int>(m_state.snakes[0].body().size());
+    emit statsUpdated(m_state.score, len, m_elapsedSec,
+                      m_speedMs, m_kills, 1, 1);
+
     if (m_state.gameOver) {
         m_timer->stop();
         m_phase = State::GameOver;
@@ -185,4 +203,10 @@ void GameController::processCollisions(const std::vector<CollisionReport>& repor
 
     if (anyoneAte)
         m_state.food.markEaten();
+
+    // 统计击杀：OtherBody 中 otherSnakeIndex 是身体拥有者（击杀方）
+    for (auto& r : reports) {
+        if (r.type == CollisionType::OtherBody && r.otherSnakeIndex == 0)
+            m_kills++;
+    }
 }

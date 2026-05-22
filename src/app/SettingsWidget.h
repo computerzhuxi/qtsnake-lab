@@ -36,6 +36,8 @@ signals:
 
 private:
     void refreshStyle(QWidget* w);
+    void loadSettings();
+    void saveSettings() const;
 
     QStackedWidget* m_stack;
     QPushButton* m_btnControl;

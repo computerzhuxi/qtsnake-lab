@@ -7,6 +7,7 @@
 #include <QSlider>
 #include <QStackedWidget>
 #include <QStyle>
+#include <QSettings>
 
 SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
     setObjectName("overlay");
@@ -165,6 +166,11 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
     });
 
     hide();
+
+    loadSettings();
+    for (auto* cb : {m_speedCombo, m_sizeCombo, m_keyCombo})
+        connect(cb, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                this, [this]() { saveSettings(); });
 }
 
 void SettingsWidget::refreshStyle(QWidget* w) {
@@ -191,4 +197,30 @@ QString SettingsWidget::keyBinding() const {
 void SettingsWidget::setGameSettings(int speedMs, int boardSize) {
     m_gameSpeedMs = speedMs;
     m_gameBoardSize = boardSize;
+}
+
+void SettingsWidget::loadSettings() {
+    QSettings s;
+
+    int speedMs = s.value("game/speedMs", 100).toInt();
+    int sizes[] = {150, 100, 60};
+    for (int i = 0; i < 3; ++i) {
+        if (sizes[i] == speedMs) { m_speedCombo->setCurrentIndex(i); break; }
+    }
+
+    int boardSize = s.value("game/boardSize", 20).toInt();
+    int boards[] = {15, 20, 30};
+    for (int i = 0; i < 3; ++i) {
+        if (boards[i] == boardSize) { m_sizeCombo->setCurrentIndex(i); break; }
+    }
+
+    QString kb = s.value("control/keyBinding", "arrows").toString();
+    m_keyCombo->setCurrentIndex(kb == "wasd" ? 1 : 0);
+}
+
+void SettingsWidget::saveSettings() const {
+    QSettings s;
+    s.setValue("game/speedMs", speedMs());
+    s.setValue("game/boardSize", boardSize());
+    s.setValue("control/keyBinding", keyBinding());
 }

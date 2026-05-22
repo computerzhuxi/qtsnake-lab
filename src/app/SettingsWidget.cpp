@@ -62,10 +62,10 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
     auto* keyLabel = new QLabel(tr("移动键位"), controlPage);
     keyLabel->setObjectName("settingsLabel");
 
-    auto* keyCombo = new QComboBox(controlPage);
-    keyCombo->setObjectName("settingsCombo");
-    keyCombo->addItem(tr("方向键"));
-    keyCombo->addItem("WASD");
+    m_keyCombo = new QComboBox(controlPage);
+    m_keyCombo->setObjectName("settingsCombo");
+    m_keyCombo->addItem(tr("方向键"));
+    m_keyCombo->addItem("WASD");
 
     auto* langLabel = new QLabel(tr("语言 / Language"), controlPage);
     langLabel->setObjectName("settingsLabel");
@@ -76,7 +76,7 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
     langCombo->addItem("English");
 
     controlLayout->addWidget(keyLabel);
-    controlLayout->addWidget(keyCombo);
+    controlLayout->addWidget(m_keyCombo);
     controlLayout->addWidget(langLabel);
     controlLayout->addWidget(langCombo);
     controlLayout->addStretch();
@@ -89,18 +89,18 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
     auto* speedLabel = new QLabel(tr("游戏速度"), gamePage);
     speedLabel->setObjectName("settingsLabel");
 
-    auto* speedCombo = new QComboBox(gamePage);
-    speedCombo->setObjectName("settingsCombo");
-    speedCombo->addItems({tr("慢 (150ms)"), tr("中 (100ms)"), tr("快 (60ms)")});
-    speedCombo->setCurrentIndex(1);
+    m_speedCombo = new QComboBox(gamePage);
+    m_speedCombo->setObjectName("settingsCombo");
+    m_speedCombo->addItems({tr("慢 (150ms)"), tr("中 (100ms)"), tr("快 (60ms)")});
+    m_speedCombo->setCurrentIndex(1);
 
     auto* sizeLabel = new QLabel(tr("棋盘大小"), gamePage);
     sizeLabel->setObjectName("settingsLabel");
 
-    auto* sizeCombo = new QComboBox(gamePage);
-    sizeCombo->setObjectName("settingsCombo");
-    sizeCombo->addItems({tr("小 (15×15)"), tr("中 (20×20)"), tr("大 (30×30)")});
-    sizeCombo->setCurrentIndex(1);
+    m_sizeCombo = new QComboBox(gamePage);
+    m_sizeCombo->setObjectName("settingsCombo");
+    m_sizeCombo->addItems({tr("小 (15×15)"), tr("中 (20×20)"), tr("大 (30×30)")});
+    m_sizeCombo->setCurrentIndex(1);
 
     auto* volLabel = new QLabel(tr("音量"), gamePage);
     volLabel->setObjectName("settingsLabel");
@@ -122,9 +122,9 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
     volRow->addWidget(volValue);
 
     gameLayout->addWidget(speedLabel);
-    gameLayout->addWidget(speedCombo);
+    gameLayout->addWidget(m_speedCombo);
     gameLayout->addWidget(sizeLabel);
-    gameLayout->addWidget(sizeCombo);
+    gameLayout->addWidget(m_sizeCombo);
     gameLayout->addWidget(volLabel);
     gameLayout->addLayout(volRow);
     gameLayout->addStretch();
@@ -162,4 +162,20 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
 void SettingsWidget::refreshStyle(QWidget* w) {
     w->style()->unpolish(w);
     w->style()->polish(w);
+}
+
+int SettingsWidget::speedMs() const {
+    int map[] = {150, 100, 60};
+    int idx = m_speedCombo->currentIndex();
+    return (idx >= 0 && idx < 3) ? map[idx] : 100;
+}
+
+int SettingsWidget::boardSize() const {
+    int map[] = {15, 20, 30};
+    int idx = m_sizeCombo->currentIndex();
+    return (idx >= 0 && idx < 3) ? map[idx] : 20;
+}
+
+QString SettingsWidget::keyBinding() const {
+    return m_keyCombo->currentIndex() == 1 ? "wasd" : "arrows";
 }

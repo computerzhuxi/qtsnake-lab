@@ -96,6 +96,9 @@ void AppShell::showSettings() {
 void AppShell::startSinglePlayer() {
     showGame();
 
+    int speedMs  = m_settingsWidget->speedMs();
+    int boardSize = m_settingsWidget->boardSize();
+
     m_controller = std::make_unique<GameController>(m_gamePage->scene());
 
     connect(m_controller.get(), &GameController::stateChanged,
@@ -108,8 +111,8 @@ void AppShell::startSinglePlayer() {
     connect(m_controller.get(), &GameController::statsUpdated,
             this, &AppShell::onStatsUpdated);
 
-    m_controller->startGame(20, 20, 100);
-    m_gamePage->updateStats(0, 3, 0, m_controller->speedMs(), 0, 1, 1);
+    m_controller->startGame(boardSize, boardSize, speedMs);
+    m_gamePage->updateStats(0, 3, 0, speedMs, 0, 1, 1);
     m_gamePage->view()->fitInView(m_gamePage->scene()->sceneRect(), Qt::KeepAspectRatio);
     setFocus();
 }
@@ -128,15 +131,21 @@ void AppShell::keyPressEvent(QKeyEvent* event) {
     }
 
     if (state == GameController::State::Playing) {
-        switch (event->key()) {
-            case Qt::Key_Up:    m_controller->input()->setDirection(Direction::Up);    break;
-            case Qt::Key_Down:  m_controller->input()->setDirection(Direction::Down);  break;
-            case Qt::Key_Left:  m_controller->input()->setDirection(Direction::Left);  break;
-            case Qt::Key_Right: m_controller->input()->setDirection(Direction::Right); break;
-            case Qt::Key_Escape:
-                m_controller->pause();
-                m_gamePage->showPause();
-                break;
+        QString kb = m_settingsWidget->keyBinding();
+        bool wasd = (kb == "wasd");
+        int k = event->key();
+
+        if ((!wasd && k == Qt::Key_Up)    || (wasd && k == Qt::Key_W))
+            m_controller->input()->setDirection(Direction::Up);
+        else if ((!wasd && k == Qt::Key_Down)  || (wasd && k == Qt::Key_S))
+            m_controller->input()->setDirection(Direction::Down);
+        else if ((!wasd && k == Qt::Key_Left)  || (wasd && k == Qt::Key_A))
+            m_controller->input()->setDirection(Direction::Left);
+        else if ((!wasd && k == Qt::Key_Right) || (wasd && k == Qt::Key_D))
+            m_controller->input()->setDirection(Direction::Right);
+        else if (k == Qt::Key_Escape) {
+            m_controller->pause();
+            m_gamePage->showPause();
         }
     }
 

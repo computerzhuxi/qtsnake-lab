@@ -12,7 +12,7 @@
 |---|---|---|---|
 | Phase-1 基础骨架（core / ui / controller / app 主流程） | ✅ 已完成 | — / 2026-05 前 | 现有代码与测试 |
 | **Phase-2 巩固重构** | ✅ 已完成 | **2026-05-18 ~ 2026-05-19** | 10 正式 + 3 hotfix = 13 张，46 测试全绿 |
-| **Phase-3 打磨（UI + 碰撞重构）** | **🔄 进行中** | **2026-05-19** | 碰撞重构 6 张 + UI 6 张 = 12 张，严格串行 |
+| **Phase-3 打磨（UI + 碰撞重构）** | **🔄 进行中** | **2026-05-19** | 分支 `phase-3-collision-refactor`；T-11~T-13 铺设接口，T-13a 增量位掩码重构，T-14~T-15 收尾 |
 | Phase-4 联机对战 | ⏸ 未启动 | — | 依赖 T-09 状态机测试基线 |
 | Phase-5 回放 | ⏸ 未启动 | — | 依赖 T-03 / T-09 |
 | Phase-6 i18n + 音效落地 | ⏸ 未启动 | — | 无强依赖 |
@@ -51,15 +51,20 @@
 | T-11 | 碰撞数据结构 + 接口定义 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 文件（2 新增头 + Board 改），46 测试全绿，countdownToPlaying flaky 非本卡引入 |
 | T-12 | NaiveCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 6 文件变更，8 用例，54/54 全绿，算法与伪代码逐行一致 |
 | T-13 | GridCollisionDetector + 测试 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 4 文件变更，9 用例含 cross-validation，63/63 全绿 |
-| T-14 | CollisionResolver + 测试 | `pending` | — | — | — | 依赖 T-11 |
-| T-15 | MoveComponent 吸收 freeCells + FoodSpawner | `pending` | — | — | — | 依赖 T-11 |
-| T-16 | Controller 流水线重构 + 删旧组件 | `pending` | — | — | — | 依赖 T-12~T-15 |
-| T-17 | SnakeItem 渐变色 + 发光 | `pending` | — | — | — | — |
-| T-18 | FoodItem 光晕 + GameScene 网格线 | `pending` | — | — | — | — |
-| T-19 | InfoBar + LeaderboardWidget | `pending` | — | — | — | — |
-| T-20 | GameOverWidget 多人排名表 | `pending` | — | — | — | — |
-| T-21 | ShineLabel 反光文字 | `pending` | — | — | — | — |
-| T-22 | SettingsWidget Tab 重构 + QSS 收尾 | `pending` | — | — | — | — |
+| T-14 | Board struct→class + Snake growPending 读即消费 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 15 文件变更，Board.cpp 新增，63/63 全绿 |
+| T-15 | CollisionComponent 纯 detect + Controller processCollisions | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | detect const 纯检测，processCollisions 先死后吃，63/63 全绿 |
+| T-16 | FoodSpawner + 删旧文件 + Controller 流水线收尾 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 6 旧文件删除，46/46 全绿 |
+| T-16a | Food class + Board 删食物 + 文件整理 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | Food class 集中食物状态，Board 回归空间索引，controller 打平，45/45 全绿 |
+| T-17 | SnakeItem 渐变色 + 发光 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | setColor + 渐变插值 + 4 层霓虹发光，45/45 全绿 |
+| T-18 | FoodItem 光晕 + GameScene 网格线 | `passed` | dev-agent | 2026-05-19 | 2026-05-19 | 3 层红色光晕 + drawForeground 网格线，45/45 全绿 |
+| T-19 | InfoBar + LeaderboardWidget | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | GamePage 三段式布局 + InfoBar 六列居中 + LeaderboardWidget 排名侧栏，含 T-19a HUD 对齐修复 |
+| T-20 | GameOverWidget 多人排名表 + PauseWidget 面板化 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | 两个浮层 overlay→panel 重构 + 双轴居中 + 多人排名表 QGridLayout |
+| T-21 | ShineLabel 反光文字 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | QLinearGradient + QTimer 绿色亮带扫光动画，h*0.95 动态比例替换 hint QSS
+| T-22 | SettingsWidget Tab 重构 + QSS 收尾 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | overlay→panel 双轴居中 + QPushButton 自定义 Tab + QStackedWidget + QSS 暗色表单
+| T-23 | Controller 数据管道（kills + 时间 + stats 信号） | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | statsUpdated 信号 + kills 计数 + QDateTime 计时，单人 kills=0
+| T-24 | AppShell/GamePage 接线（InfoBar + LB + GameOver 数据落地） | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | statsUpdated→updateStats→InfoBar 实时 + LB 单人行 + GameOver 真实数据
+| T-25 | Settings 集成（速度/大小/键位实际生效） | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | speedMs/boardSize/keyBinding getter + WASD 双键位 + 设置跨局保留
+| T-26 | Settings 修改弹窗 | `pending` | — | — | — | — |
 
 ---
 
@@ -69,6 +74,8 @@
 
 | 日期 | Task | 结论 | 审查要点 / 打回理由 |
 |---|---|---|---|
+| 2026-05-19 | T-15 | **通过（passed）** | CollisionComponent detect const 纯检测；Controller processCollisions 先死后吃；63/63 全绿 |
+| 2026-05-19 | T-14 | **通过（passed）** | Board class 封装 grid+freeCells；Snake growPending 读即消费；MoveComponent move→读→removeHead→removeTail→placeHead；63/63 全绿 |
 | 2026-05-19 | T-13 | **通过（passed）** | Grid + epoch 算法正确；9 用例含 cross-validation 100 随机状态一致；63/63 全绿 |
 | 2026-05-19 | T-12 | **通过（passed）** | NaiveCollisionDetector 算法与伪代码逐行一致；8 用例覆盖全部 7 种 CollisionType；54/54 全绿 /W4 零警告 |
 | 2026-05-19 | T-11 | **通过（passed）** | CollisionReport.h / ICollisionDetector.h / Board.h 全部达标；46/46 全绿 |

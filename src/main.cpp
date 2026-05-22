@@ -5,6 +5,8 @@
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
+    app.setOrganizationName("SnakeArena");
+    app.setApplicationName("SnakeArena");
 
     QFile qss(":/style/main.qss");
     if (qss.open(QFile::ReadOnly)) {

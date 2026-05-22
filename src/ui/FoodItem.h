@@ -5,7 +5,7 @@
 #include <QColor>
 
 /// \brief 食物渲染项
-/// \details 圆形（半径 6px）+ 红色 #ff4466 填充 + 无边线。
+/// \details 圆形（半径 6px）+ 红色 #ff4466 填充 + 3 层霓虹光晕。
 ///          在 24×24 的格子内居中绘制。
 
 class FoodItem : public QGraphicsItem {

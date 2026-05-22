@@ -21,6 +21,9 @@ public:
     /// \brief 清空所有 item
     void clearAll();
 
+protected:
+    void drawForeground(QPainter* painter, const QRectF& rect) override;
+
 private:
     QMap<int, QVector<SnakeItem*>> m_snakeItems;
     FoodItem* m_foodItem = nullptr;

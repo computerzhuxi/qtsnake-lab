@@ -87,7 +87,6 @@ QWidget#panel {
 
 /* 倒计时 */
 QLabel#CountdownLabel { background: transparent; }
-QLabel#CountdownLabel[state="hint"] { font-size: 18px; color: #556; padding-bottom: 60px; }
 QLabel#CountdownLabel[state="count"] { font-size: 72px; color: #00ff88; }
 QLabel#CountdownLabel[state="go"] { font-size: 72px; color: #00ff88; }
 
@@ -136,9 +135,204 @@ QPushButton#btnExit {
 }
 QPushButton#btnExit:hover { color: #ff6688; }
 
+/* PauseWidget */
+QLabel#pauseTitle {
+    color: #e0e0ff;
+    font-size: 22px;
+    font-family: monospace;
+    letter-spacing: 4px;
+}
+
 /* 结算页 */
 QLabel#gameOverTitle {
     color: #ff6688;
     font-size: 18px;
     letter-spacing: 6px;
+}
+QLabel#goSubtitle {
+    color: #556;
+    font-size: 12px;
+    font-family: monospace;
+    padding-bottom: 8px;
+}
+QLabel#goStats {
+    color: #556;
+    font-size: 12px;
+}
+QLabel#resultHeader {
+    color: #445;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 4px 8px;
+}
+QLabel#resultCell {
+    color: #ccc;
+    font-size: 13px;
+    padding: 5px 8px;
+}
+QLabel#resultCell[you="true"] {
+    color: #00ff88;
+}
+QLabel#resultCell[rankLevel="gold"]   { color: #ffd700; font-weight: bold; }
+QLabel#resultCell[rankLevel="silver"] { color: #c0c0c0; font-weight: bold; }
+QLabel#resultCell[rankLevel="bronze"] { color: #cd7f32; font-weight: bold; }
+QLabel#resultCell[alive="true"]  { color: #00ff88; }
+QLabel#resultCell[alive="false"] { color: #ff6688; }
+QWidget#resultDivider {
+    background: #0a0a0a;
+    max-height: 1px;
+}
+
+/* InfoBar */
+QWidget#infoBar {
+    background: #0a0a1a;
+    border-bottom: 1px solid #0f2f1a;
+}
+QLabel#hudLabel { color: #556; font-size: 8px; letter-spacing: 2px; }
+QWidget#hudDivider {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 transparent, stop:0.5 rgba(0,255,136,40), stop:1 transparent);
+}
+QLabel#scoreValue  { color: #00ff88; font-size: 18px; font-weight: bold; }
+QLabel#lengthValue { color: #ccc;    font-size: 18px; }
+QLabel#timeValue   { color: #ccc;    font-size: 18px; }
+QLabel#speedValue  { color: #ccc;    font-size: 18px; }
+QLabel#killsValue  { color: #ff6688; font-size: 18px; }
+QLabel#rankValue   { color: #00ff88; font-size: 18px; }
+
+/* Leaderboard */
+QWidget#leaderboard {
+    background: #08081a;
+    border-left: 1px solid #0d2a17;
+}
+QLabel#rankTitle { color: #556; font-size: 10px; letter-spacing: 3px; padding-bottom: 4px; }
+QLabel#rankAlive { color: #556; font-size: 8px; padding-top: 4px; }
+QWidget#rankRow { background: transparent; border: 1px solid transparent; border-radius: 4px; }
+QWidget#rankRow[self="true"] { border-color: #225544; background: #0a1a14; }
+QLabel#rankNum { color: #778; font-size: 12px; font-weight: bold; }
+QLabel#rankNum[rankLevel="gold"]   { color: #ffd700; }
+QLabel#rankNum[rankLevel="silver"] { color: #c0c0c0; }
+QLabel#rankNum[rankLevel="bronze"] { color: #cd7f32; }
+QWidget#rankDot { border-radius: 2px; }
+QWidget#rankDot[dotAlive="true"]  { background: #00ff88; }
+QWidget#rankDot[dotAlive="false"] { background: #444; }
+QLabel#rankName { color: #ccc; font-size: 12px; }
+QLabel#rankName[alive="false"] { color: #555; }
+QLabel#rankScore { color: #00ff88; font-size: 12px; }
+QLabel#rankScore[alive="false"] { color: #555; }
+
+/* SettingsWidget */
+QWidget#settingsPanel {
+    background: #0a0a1a;
+    border: 1px solid #1a1a4e;
+    border-radius: 10px;
+}
+QLabel#settingsTitle {
+    color: #e0e0ff;
+    font-size: 22px;
+    font-family: monospace;
+    letter-spacing: 6px;
+}
+QPushButton#settingsTab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #556;
+    padding: 8px 0;
+    font-size: 13px;
+    font-family: monospace;
+}
+QPushButton#settingsTab[active="true"] {
+    color: #00ff88;
+    border-bottom-color: #00ff88;
+}
+QLabel#settingsLabel {
+    color: #556;
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+}
+QComboBox#settingsCombo {
+    background: #08081a;
+    border: 1px solid #1a1a4e;
+    border-radius: 4px;
+    color: #0ff;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: monospace;
+}
+QComboBox#settingsCombo:focus {
+    border-color: #00ff88;
+}
+QComboBox#settingsCombo QAbstractItemView {
+    background: #0a0a1a;
+    color: #ccc;
+    selection-background-color: #1a1a4e;
+}
+QSlider#settingsSlider::groove:horizontal {
+    height: 4px;
+    background: #1a1a4e;
+    border-radius: 2px;
+}
+QSlider#settingsSlider::handle:horizontal {
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    background: #00ff88;
+    border-radius: 7px;
+}
+QLabel#settingsSliderValue {
+    color: #00ff88;
+    font-size: 13px;
+    min-width: 24px;
+}
+
+/* SettingsDialog */
+QDialog#settingsDialog {
+    background: #0a0a1a;
+    border: 1px solid #00ff88;
+    border-radius: 8px;
+}
+QLabel#dialogIcon {
+    color: #00ff88;
+    font-size: 28px;
+    font-family: monospace;
+}
+QLabel#dialogTitle {
+    color: #e0e0ff;
+    font-size: 15px;
+    letter-spacing: 2px;
+    font-family: monospace;
+}
+QLabel#dialogDesc {
+    color: #556;
+    font-size: 11px;
+    font-family: monospace;
+}
+QPushButton#dialogPrimary {
+    background: #0a0a1a;
+    border: 1px solid #225544;
+    border-radius: 5px;
+    color: #00ff88;
+    padding: 9px 0;
+    font-size: 13px;
+    font-family: monospace;
+}
+QPushButton#dialogPrimary:hover {
+    border-color: #00ff88;
+    background: #0a1a14;
+}
+QPushButton#dialogSecondary {
+    background: #0a0a1a;
+    border: 1px solid #1a1a4e;
+    border-radius: 5px;
+    color: #ccc;
+    padding: 9px 0;
+    font-size: 13px;
+    font-family: monospace;
+}
+QPushButton#dialogSecondary:hover {
+    border-color: #ff6688;
+    color: #ff6688;
 }

@@ -5,12 +5,13 @@
 #include <QTimer>
 #include <memory>
 #include "GameState.h"
+#include "CollisionReport.h"
 
 class GameScene;
 class InputComponent;
 class MoveComponent;
 class CollisionComponent;
-class FoodComponent;
+class FoodSpawner;
 class RenderComponent;
 class RngService;
 
@@ -51,6 +52,9 @@ public:
     State state() const { return m_phase; }
     const GameState& gameState() const { return m_state; }
     int score() const { return m_state.score; }
+    int kills() const { return m_kills; }
+    int elapsedSec() const { return m_elapsedSec; }
+    int speedMs() const { return m_speedMs; }
 
     /// \brief 输入组件指针（AppShell 用 setDirection() 转发方向键）
     InputComponent* input() const { return m_input.get(); }
@@ -59,14 +63,27 @@ signals:
     void stateChanged(State newState);
     void countdownTick(int number);
     void scoreChanged(int score);
+    /// \brief 每 tick 推送 UI 所需数据（InfoBar 等消费）
+    /// \param score 当前分数
+    /// \param length 玩家蛇长度（取 snakes[0]，若无则为 0）
+    /// \param timeSec 已流逝秒数
+    /// \param speedMs 当前速度（tick 间隔毫秒）
+    /// \param kills 击杀数
+    /// \param rank 排名（单人=1）
+    /// \param totalPlayers 总玩家数（单人=1）
+    void statsUpdated(int score, int length, int timeSec,
+                      int speedMs, int kills, int rank, int totalPlayers);
 
 private slots:
     /// \brief QTimer 回调：按序调用各组件 update()
     void update();
 
 private:
-    /// \brief 初始化需要首次调用的组件（MoveComponent + FoodComponent）
+    /// \brief 初始化需要首次调用的组件（FoodComponent）
     void initComponents();
+
+    /// \brief 处理碰撞报告：先判死、后判吃，最终设 gameOver
+    void processCollisions(const std::vector<CollisionReport>& reports);
 
     QTimer* m_timer;                                ///< 主循环定时器
     QTimer* m_countdownTimer = nullptr;             ///< 倒计时定时器（3-2-1）
@@ -75,7 +92,7 @@ private:
     std::unique_ptr<MoveComponent> m_move;           ///< 蛇移动 + 空闲格
     std::unique_ptr<CollisionComponent> m_collision; ///< 碰撞检测
     std::unique_ptr<RngService> m_rng;               ///< 集中随机数服务（须在 m_food 前）
-    std::unique_ptr<FoodComponent> m_food;           ///< 食物管理
+    std::unique_ptr<FoodSpawner> m_food;              ///< 食物生成
     std::unique_ptr<RenderComponent> m_render;       ///< 渲染同步
 
     GameState m_state;                               ///< 当前游戏状态
@@ -84,6 +101,9 @@ private:
     int m_speedMs = 100;                             ///< tick 间隔
     int m_boardW = 20;                               ///< 棋盘宽度（重生用）
     int m_boardH = 20;                               ///< 棋盘高度（重生用）
+    int m_kills = 0;                                 ///< 本局击杀数
+    qint64 m_gameStartMs = 0;                        ///< 游戏开始时间戳（Playing 后首 tick 记录）
+    int m_elapsedSec = 0;                            ///< 已用秒数
 };
 
 #endif

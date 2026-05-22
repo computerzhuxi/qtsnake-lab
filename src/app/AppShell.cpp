@@ -2,9 +2,11 @@
 #include "MainMenuWidget.h"
 #include "GamePage.h"
 #include "SettingsWidget.h"
-#include "components/InputComponent.h"
+#include "SettingsDialog.h"
+#include "InputComponent.h"
 #include "Logger.h"
 #include <QVBoxLayout>
+#include <QSizePolicy>
 #include <QKeyEvent>
 
 AppShell::AppShell(QWidget* parent) : QWidget(parent) {
@@ -43,6 +45,18 @@ AppShell::AppShell(QWidget* parent) : QWidget(parent) {
     connect(m_settingsWidget, &SettingsWidget::backClicked, this, [this]() {
         m_settingsWidget->hide();
     });
+    connect(m_settingsWidget, &SettingsWidget::settingsChanged, this, [this]() {
+        auto* dlg = new SettingsDialog(this);
+        connect(dlg, &SettingsDialog::restartClicked, this, [this, dlg]() {
+            m_settingsWidget->hide();
+            m_gamePage->hideAllOverlays();
+            startSinglePlayer();
+        });
+        connect(dlg, &SettingsDialog::laterClicked, this, [this, dlg]() {
+            m_settingsWidget->hide();
+        });
+        dlg->show();
+    });
 
     LOG_INFO("AppShell", "AppShell initialized");
     showMenu();
@@ -54,6 +68,7 @@ void AppShell::setupUI() {
     layout->setContentsMargins(0, 0, 0, 0);
 
     m_stack = new QStackedWidget(this);
+    m_stack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_mainMenu = new MainMenuWidget(this);
     m_gamePage = new GamePage(this);
@@ -74,6 +89,7 @@ void AppShell::resizeEvent(QResizeEvent* event) {
 void AppShell::showMenu() {
     m_gamePage->exit();
     m_controller.reset();
+    m_settingsWidget->setGameSettings(-1, -1);
     m_stack->setCurrentIndex(0);
     m_mainMenu->enter();
     m_settingsWidget->hide();
@@ -94,6 +110,9 @@ void AppShell::showSettings() {
 void AppShell::startSinglePlayer() {
     showGame();
 
+    int speedMs  = m_settingsWidget->speedMs();
+    int boardSize = m_settingsWidget->boardSize();
+
     m_controller = std::make_unique<GameController>(m_gamePage->scene());
 
     connect(m_controller.get(), &GameController::stateChanged,
@@ -103,9 +122,13 @@ void AppShell::startSinglePlayer() {
     connect(m_controller.get(), &GameController::scoreChanged, this, [this](int score) {
         m_currentScore = score;
     });
+    connect(m_controller.get(), &GameController::statsUpdated,
+            this, &AppShell::onStatsUpdated);
 
-    m_controller->startGame(20, 20, 100);
+    m_controller->startGame(boardSize, boardSize, speedMs);
+    m_gamePage->updateStats(0, 3, 0, speedMs, 0, 1, 1);
     m_gamePage->view()->fitInView(m_gamePage->scene()->sceneRect(), Qt::KeepAspectRatio);
+    m_settingsWidget->setGameSettings(speedMs, boardSize);
     setFocus();
 }
 
@@ -123,15 +146,21 @@ void AppShell::keyPressEvent(QKeyEvent* event) {
     }
 
     if (state == GameController::State::Playing) {
-        switch (event->key()) {
-            case Qt::Key_Up:    m_controller->input()->setDirection(Direction::Up);    break;
-            case Qt::Key_Down:  m_controller->input()->setDirection(Direction::Down);  break;
-            case Qt::Key_Left:  m_controller->input()->setDirection(Direction::Left);  break;
-            case Qt::Key_Right: m_controller->input()->setDirection(Direction::Right); break;
-            case Qt::Key_Escape:
-                m_controller->pause();
-                m_gamePage->showPause();
-                break;
+        QString kb = m_settingsWidget->keyBinding();
+        bool wasd = (kb == "wasd");
+        int k = event->key();
+
+        if ((!wasd && k == Qt::Key_Up)    || (wasd && k == Qt::Key_W))
+            m_controller->input()->setDirection(Direction::Up);
+        else if ((!wasd && k == Qt::Key_Down)  || (wasd && k == Qt::Key_S))
+            m_controller->input()->setDirection(Direction::Down);
+        else if ((!wasd && k == Qt::Key_Left)  || (wasd && k == Qt::Key_A))
+            m_controller->input()->setDirection(Direction::Left);
+        else if ((!wasd && k == Qt::Key_Right) || (wasd && k == Qt::Key_D))
+            m_controller->input()->setDirection(Direction::Right);
+        else if (k == Qt::Key_Escape) {
+            m_controller->pause();
+            m_gamePage->showPause();
         }
     }
 
@@ -153,7 +182,9 @@ void AppShell::onControllerStateChanged(GameController::State state) {
         case GameController::State::GameOver: {
             const auto& gs = m_controller->gameState();
             int len = gs.snakes.empty() ? 0 : static_cast<int>(gs.snakes[0].body().size());
-            m_gamePage->showGameOver(m_currentScore, len, 0, 0);
+            m_gamePage->showGameOver(m_currentScore, len,
+                                     m_controller->kills(),
+                                     m_controller->elapsedSec());
             break;
         }
         case GameController::State::Playing:
@@ -166,4 +197,10 @@ void AppShell::onControllerStateChanged(GameController::State state) {
 
 void AppShell::onCountdownTick(int number) {
     m_gamePage->showCountdown(number);
+}
+
+void AppShell::onStatsUpdated(int score, int length, int timeSec,
+                               int speedMs, int kills, int rank, int totalPlayers) {
+    m_currentScore = score;
+    m_gamePage->updateStats(score, length, timeSec, speedMs, kills, rank, totalPlayers);
 }

@@ -4,17 +4,18 @@
 #include <vector>
 #include "Board.h"
 #include "Snake.h"
+#include "Food.h"
 
 /// \brief 游戏状态快照（纯数据）
-/// \details 聚合一帧的全部游戏数据：地图 + 所有蛇 + 游戏结束标志。
-///          回放时可直接序列化，联机时即同步数据包。
+/// \details 聚合一帧的全部游戏数据：地图 + 所有蛇 + 食物 + 游戏结束标志。
 ///          Controller 是唯一的修改者。
 
 struct GameState {
     Board board;
     std::vector<Snake> snakes;
-    bool gameOver = false;
+    Food food;
     int score = 0;
+    bool gameOver = false;
 };
 
 #endif // SNAKE_CORE_GAMESTATE_H

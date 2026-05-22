@@ -1,20 +1,64 @@
 #ifndef SNAKE_CORE_BOARD_H
 #define SNAKE_CORE_BOARD_H
 
+#include <cstdint>
 #include <unordered_set>
+#include <vector>
 #include "Point.h"
+#include "Snake.h"
 
-/// \brief 棋盘地图数据（纯数据，无逻辑）
-/// \details 存储地图尺寸、空闲格子集、食物位置。
-///          空闲格子集由 Controller 维护，食物位置由 Controller 更新。
-struct Board {
-    int width = 20;
-    int height = 20;
-    std::unordered_set<Point> freeCells;  ///< 当前空闲的格子
-    Point foodPos;                        ///< 食物位置
-    int foodPoints = 1;                   ///< 当前食物分值
-    std::unordered_set<Point> obstacles;  ///< 预留：地图障碍物格
-    bool foodEaten = false;               ///< 本 tick 食物是否被吃
+/// \brief 棋盘地图（纯空间索引：位掩码网格 + 空闲集）
+/// \details 位掩码网格由 MoveComponent 通过 placeHead/removeTail 维护，
+///          空闲集保留给 FoodSpawner 用。所有字段私有，通过方法访问。
+class Board {
+public:
+    /// \brief 单个格子的位掩码信息
+    struct CellInfo {
+        uint8_t snakeMask = 0;   // bit i = 第 i 条蛇有身体段在此
+        uint8_t headMask  = 0;   // bit i = 第 i 条蛇的头在此
+        bool hasObstacle  = false;
+    };
+
+    Board(int w = 20, int h = 20);
+
+    // -- 尺寸 --
+    int width() const  { return m_width; }
+    int height() const { return m_height; }
+    void setSize(int w, int h);
+
+    // -- 初始构建（从蛇身填充 grid + freeCells） --
+    void initFromSnakes(const std::vector<Snake>& snakes);
+
+    // -- MoveComponent 调用 --
+    void placeHead(int snakeIdx, Point pos);
+    void placeBody(int snakeIdx, Point pos);
+    void removeHead(int snakeIdx, Point pos);
+    void removeTail(int snakeIdx, Point pos);
+
+    // -- 查询 --
+    bool isOutOfBounds(Point pos) const;
+    const CellInfo& cellAt(Point pos) const;
+
+    // -- 食物标记（仅设 grid 位，由 Food::placeAt/remove 调用） --
+    void setFoodFlag(Point pos, bool value);
+
+    // -- 空闲集 --
+    const std::unordered_set<Point>& freeCells() const { return m_freeCells; }
+    void addFreeCell(Point pos)        { m_freeCells.insert(pos); }
+    void removeFreeCell(Point pos)     { m_freeCells.erase(pos); }
+
+    // -- 障碍物（预留） --
+    const std::unordered_set<Point>& obstacles() const { return m_obstacles; }
+    void addObstacle(Point pos);
+
+private:
+    int m_width = 20;
+    int m_height = 20;
+    std::unordered_set<Point> m_freeCells;
+    std::vector<std::vector<CellInfo>> m_grid;
+    std::unordered_set<Point> m_obstacles;
+
+    void ensureGrid(int w, int h);
 };
 
 #endif // SNAKE_CORE_BOARD_H

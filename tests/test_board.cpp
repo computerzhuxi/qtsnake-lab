@@ -4,22 +4,17 @@
 
 TEST(Board, defaultSizeIs20x20) {
     Board board;
-    EXPECT_EQ(board.width, 20);
-    EXPECT_EQ(board.height, 20);
+    EXPECT_EQ(board.width(), 20);
+    EXPECT_EQ(board.height(), 20);
 }
 
 TEST(Board, customSize) {
-    Board board{15, 10};
-    EXPECT_EQ(board.width, 15);
-    EXPECT_EQ(board.height, 10);
+    Board board(15, 10);
+    EXPECT_EQ(board.width(), 15);
+    EXPECT_EQ(board.height(), 10);
 }
 
 TEST(Board, freeCellsEmptyByDefault) {
     Board board;
-    EXPECT_TRUE(board.freeCells.empty());
-}
-
-TEST(Board, foodPosDefaultIsOrigin) {
-    Board board;
-    EXPECT_EQ(board.foodPos, Point(0, 0));
+    EXPECT_TRUE(board.freeCells().empty());
 }

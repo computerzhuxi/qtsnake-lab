@@ -8,6 +8,9 @@
 
 class PauseWidget;
 class GameOverWidget;
+class InfoBar;
+class LeaderboardWidget;
+class ShineLabel;
 class QLabel;
 
 /// \brief 游戏页面
@@ -30,6 +33,10 @@ public:
     void showCountdown(int number);
     void hideAllOverlays();
 
+    /// \brief 每 tick 更新 UI 数据（InfoBar + Leaderboard）
+    void updateStats(int score, int length, int timeSec,
+                     int speedMs, int kills, int rank, int totalPlayers);
+
 signals:
     void resumeClicked();
     void restartClicked();
@@ -43,9 +50,12 @@ protected:
 private:
     GameScene* m_scene;                     ///< 渲染场景
     GameView* m_view;                       ///< 渲染视口
+    InfoBar* m_infoBar;                     ///< 顶部信息栏
+    LeaderboardWidget* m_leaderboard;       ///< 右侧排行榜
     PauseWidget* m_pauseWidget;             ///< 暂停浮层
     GameOverWidget* m_gameOver;             ///< 结算浮层
     QLabel* m_countdownLabel;               ///< 倒计时/提示文字
+    ShineLabel* m_shineLabel;               ///< 反光提示文字
 };
 
 #endif // SNAKE_APP_GAMEPAGE_H

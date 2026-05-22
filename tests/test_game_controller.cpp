@@ -179,11 +179,11 @@ TEST(GameController, sameSeedSameFoodSequence) {
     c1.setSeed(42); c2.setSeed(42);
     c1.startGame(10, 10, 100);
     c2.startGame(10, 10, 100);
-    EXPECT_EQ(c1.gameState().board.foodPos, c2.gameState().board.foodPos);
+    EXPECT_EQ(c1.gameState().food.position(), c2.gameState().food.position());
 
     c1.handleReadyKey(); c2.handleReadyKey();
     pumpFor(3000);
-    EXPECT_EQ(c1.gameState().board.foodPos, c2.gameState().board.foodPos);
+    EXPECT_EQ(c1.gameState().food.position(), c2.gameState().food.position());
 }
 
 TEST(GameController, setSeedProducesDeterministicStart) {
@@ -200,7 +200,7 @@ TEST(GameController, setSeedProducesDeterministicStart) {
     const auto& gs1 = c1.gameState();
     const auto& gs2 = c2.gameState();
 
-    EXPECT_EQ(gs1.board.foodPos, gs2.board.foodPos);
+    EXPECT_EQ(gs1.food.position(), gs2.food.position());
     EXPECT_EQ(gs1.snakes[0].head(), gs2.snakes[0].head());
     EXPECT_EQ(gs1.snakes[0].body(), gs2.snakes[0].body());
 }
@@ -210,10 +210,10 @@ TEST(GameController, setSeedIgnoredOutsideIdle) {
     GameController c(&scene);
     c.setSeed(42);
     c.startGame(10, 10, 100);
-    Point foodAfterStart = c.gameState().board.foodPos;
+    Point foodAfterStart = c.gameState().food.position();
 
     c.setSeed(12345);
-    EXPECT_EQ(c.gameState().board.foodPos, foodAfterStart);
+    EXPECT_EQ(c.gameState().food.position(), foodAfterStart);
 }
 
 // ========== 信号契约 ==========

@@ -287,3 +287,52 @@ QLabel#settingsSliderValue {
     font-size: 13px;
     min-width: 24px;
 }
+
+/* SettingsDialog */
+QDialog#settingsDialog {
+    background: #0a0a1a;
+    border: 1px solid #00ff88;
+    border-radius: 8px;
+}
+QLabel#dialogIcon {
+    color: #00ff88;
+    font-size: 28px;
+    font-family: monospace;
+}
+QLabel#dialogTitle {
+    color: #e0e0ff;
+    font-size: 15px;
+    letter-spacing: 2px;
+    font-family: monospace;
+}
+QLabel#dialogDesc {
+    color: #556;
+    font-size: 11px;
+    font-family: monospace;
+}
+QPushButton#dialogPrimary {
+    background: #0a0a1a;
+    border: 1px solid #225544;
+    border-radius: 5px;
+    color: #00ff88;
+    padding: 9px 0;
+    font-size: 13px;
+    font-family: monospace;
+}
+QPushButton#dialogPrimary:hover {
+    border-color: #00ff88;
+    background: #0a1a14;
+}
+QPushButton#dialogSecondary {
+    background: #0a0a1a;
+    border: 1px solid #1a1a4e;
+    border-radius: 5px;
+    color: #ccc;
+    padding: 9px 0;
+    font-size: 13px;
+    font-family: monospace;
+}
+QPushButton#dialogSecondary:hover {
+    border-color: #ff6688;
+    color: #ff6688;
+}

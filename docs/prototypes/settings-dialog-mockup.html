@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings Confirm Dialog — Mockup</title>
+<style>
+  :root {
+    --bg-deep:    #06060f;
+    --bg-panel:   #0a0a1a;
+    --border:     #1a1a4e;
+    --border-hl:  #00ff88;
+    --text-main:  #ccc;
+    --text-bright:#e0e0ff;
+    --text-dim:   #556;
+    --danger:     #ff6688;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #020208;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; user-select: none;
+    font-family: "Consolas", "Courier New", monospace;
+  }
+
+  /* ---- Stage ---- */
+  .stage {
+    position: relative; width: 800px; height: 600px;
+    background: var(--bg-deep);
+    border: 2px solid #111133; border-radius: 12px; overflow: hidden;
+  }
+
+  /* ---- Settings overlay (background) ---- */
+  .settings-overlay {
+    position: absolute; inset: 0; z-index: 60;
+    background: rgba(6,6,15,0.94);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .settings-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px 40px; min-width: 400px; text-align: center;
+  }
+
+  /* ---- Dialog overlay (on top of settings) ---- */
+  .dialog-overlay {
+    position: absolute; inset: 0; z-index: 70;
+    background: rgba(6,6,15,0.88);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dialog-box {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-hl);
+    border-radius: 8px;
+    padding: 24px 32px;
+    min-width: 340px; max-width: 380px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0,255,136,0.08);
+  }
+  .dialog-icon {
+    font-size: 28px; margin-bottom: 10px;
+    color: var(--border-hl);
+  }
+  .dialog-title {
+    color: var(--text-bright);
+    font-size: 15px; letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .dialog-desc {
+    color: var(--text-dim);
+    font-size: 11px; line-height: 1.6;
+    margin-bottom: 18px;
+  }
+  .dialog-desc span {
+    color: var(--border-hl);
+  }
+  .dialog-buttons {
+    display: flex; gap: 10px;
+  }
+  .dialog-buttons button {
+    flex: 1;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text-main);
+    padding: 9px 0;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .dialog-buttons button.primary {
+    color: var(--border-hl);
+    border-color: #225544;
+  }
+  .dialog-buttons button.primary:hover {
+    border-color: var(--border-hl);
+    background: #0a1a14;
+  }
+  .dialog-buttons button:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <!-- Settings page underneath -->
+  <div class="settings-overlay">
+    <div class="settings-panel">
+      <div style="color:#e0e0ff;font-size:22px;letter-spacing:6px;margin-bottom:20px;">设 置</div>
+      <div style="display:flex;border-bottom:1px solid #1a1a4e;margin-bottom:16px;">
+        <button style="flex:1;background:transparent;border:none;border-bottom:2px solid transparent;color:#556;padding:8px 0;font-size:13px;font-family:inherit;cursor:pointer;">操作</button>
+        <button style="flex:1;background:transparent;border:none;border-bottom:2px solid #00ff88;color:#00ff88;padding:8px 0;font-size:13px;font-family:inherit;cursor:pointer;">游戏</button>
+      </div>
+      <div style="text-align:left;margin-bottom:8px;">
+        <div style="color:#556;font-size:10px;letter-spacing:2px;margin-bottom:4px;">游戏速度</div>
+        <select style="width:100%;background:#08081a;border:1px solid #1a1a4e;border-radius:4px;color:#0ff;padding:7px 12px;font-size:13px;font-family:inherit;">
+          <option>慢 (150ms)</option>
+          <option selected>中 (100ms)</option>
+          <option>快 (60ms)</option>
+        </select>
+      </div>
+      <button style="width:100%;background:#0d0d28;border:1px solid #222255;border-radius:5px;color:#ccc;padding:10px 0;font-size:14px;font-family:inherit;cursor:pointer;margin-top:16px;">返回</button>
+    </div>
+  </div>
+
+  <!-- Confirm dialog on top -->
+  <div class="dialog-overlay">
+    <div class="dialog-box">
+      <div class="dialog-icon">!</div>
+      <div class="dialog-title">设 置 已 更 改</div>
+      <div class="dialog-desc">
+        将在 <span>下一局</span> 生效
+      </div>
+      <div class="dialog-buttons">
+        <button class="primary">重新开始</button>
+        <button>稍后再说</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -136,7 +136,15 @@ SettingsWidget::SettingsWidget(QWidget* parent) : QWidget(parent) {
     panelLayout->addSpacing(16);
 
     auto* btnBack = new QPushButton(tr("返回"), panel);
-    connect(btnBack, &QPushButton::clicked, this, &SettingsWidget::backClicked);
+    connect(btnBack, &QPushButton::clicked, this, [this]() {
+        if (m_gameSpeedMs > 0 && m_gameBoardSize > 0) {
+            if (speedMs() != m_gameSpeedMs || boardSize() != m_gameBoardSize) {
+                emit settingsChanged();
+                return;
+            }
+        }
+        emit backClicked();
+    });
     panelLayout->addWidget(btnBack);
 
     // --- Tab switch ---
@@ -178,4 +186,9 @@ int SettingsWidget::boardSize() const {
 
 QString SettingsWidget::keyBinding() const {
     return m_keyCombo->currentIndex() == 1 ? "wasd" : "arrows";
+}
+
+void SettingsWidget::setGameSettings(int speedMs, int boardSize) {
+    m_gameSpeedMs = speedMs;
+    m_gameBoardSize = boardSize;
 }

@@ -27,8 +27,12 @@ public:
     /// \brief 当前选中的键位方案（"arrows" / "wasd"）
     QString keyBinding() const;
 
+    /// \brief 记录当前游戏使用的设置值（用于脏检测，-1 表示无活跃游戏）
+    void setGameSettings(int speedMs, int boardSize);
+
 signals:
     void backClicked();
+    void settingsChanged();
 
 private:
     void refreshStyle(QWidget* w);
@@ -39,6 +43,8 @@ private:
     QComboBox* m_speedCombo;
     QComboBox* m_sizeCombo;
     QComboBox* m_keyCombo;
+    int m_gameSpeedMs = -1;
+    int m_gameBoardSize = -1;
 };
 
 #endif // SNAKE_APP_SETTINGSWIDGET_H

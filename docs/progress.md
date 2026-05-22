@@ -63,7 +63,8 @@
 | T-22 | SettingsWidget Tab 重构 + QSS 收尾 | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | overlay→panel 双轴居中 + QPushButton 自定义 Tab + QStackedWidget + QSS 暗色表单
 | T-23 | Controller 数据管道（kills + 时间 + stats 信号） | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | statsUpdated 信号 + kills 计数 + QDateTime 计时，单人 kills=0
 | T-24 | AppShell/GamePage 接线（InfoBar + LB + GameOver 数据落地） | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | statsUpdated→updateStats→InfoBar 实时 + LB 单人行 + GameOver 真实数据
-| T-25 | Settings 集成（速度/大小/键位实际生效） | `pending` | — | — | — | — |
+| T-25 | Settings 集成（速度/大小/键位实际生效） | `passed` | dev-agent | 2026-05-21 | 2026-05-21 | speedMs/boardSize/keyBinding getter + WASD 双键位 + 设置跨局保留
+| T-26 | Settings 修改弹窗 | `pending` | — | — | — | — |
 
 ---
 

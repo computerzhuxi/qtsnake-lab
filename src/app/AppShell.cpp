@@ -2,6 +2,7 @@
 #include "MainMenuWidget.h"
 #include "GamePage.h"
 #include "SettingsWidget.h"
+#include "SettingsDialog.h"
 #include "InputComponent.h"
 #include "Logger.h"
 #include <QVBoxLayout>
@@ -44,6 +45,18 @@ AppShell::AppShell(QWidget* parent) : QWidget(parent) {
     connect(m_settingsWidget, &SettingsWidget::backClicked, this, [this]() {
         m_settingsWidget->hide();
     });
+    connect(m_settingsWidget, &SettingsWidget::settingsChanged, this, [this]() {
+        auto* dlg = new SettingsDialog(this);
+        connect(dlg, &SettingsDialog::restartClicked, this, [this, dlg]() {
+            m_settingsWidget->hide();
+            m_gamePage->hideAllOverlays();
+            startSinglePlayer();
+        });
+        connect(dlg, &SettingsDialog::laterClicked, this, [this, dlg]() {
+            m_settingsWidget->hide();
+        });
+        dlg->show();
+    });
 
     LOG_INFO("AppShell", "AppShell initialized");
     showMenu();
@@ -76,6 +89,7 @@ void AppShell::resizeEvent(QResizeEvent* event) {
 void AppShell::showMenu() {
     m_gamePage->exit();
     m_controller.reset();
+    m_settingsWidget->setGameSettings(-1, -1);
     m_stack->setCurrentIndex(0);
     m_mainMenu->enter();
     m_settingsWidget->hide();
@@ -114,6 +128,7 @@ void AppShell::startSinglePlayer() {
     m_controller->startGame(boardSize, boardSize, speedMs);
     m_gamePage->updateStats(0, 3, 0, speedMs, 0, 1, 1);
     m_gamePage->view()->fitInView(m_gamePage->scene()->sceneRect(), Qt::KeepAspectRatio);
+    m_settingsWidget->setGameSettings(speedMs, boardSize);
     setFocus();
 }
 
